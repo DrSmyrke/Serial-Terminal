@@ -21,7 +21,8 @@ win32|win64{
 SOURCES += \
     global.cpp \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    serialport.cpp
 
 HEADERS += \
     global.h \
