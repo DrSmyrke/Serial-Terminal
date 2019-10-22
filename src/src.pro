@@ -2,7 +2,7 @@ QT       += core gui serialport
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = SerialTerminal
+TARGET = serialterm
 CONFIG += c++11
 
 DEFINES += QT_DEPRECATED_WARNINGS
@@ -10,6 +10,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 OBJECTS_DIR         = ../build
 MOC_DIR             = ../build
 RCC_DIR             = ../build
+UI_DIR              = ../build
 DESTDIR             = ../bin
 
 win32|win64{

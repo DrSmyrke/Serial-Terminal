@@ -48,8 +48,21 @@ MainWindow::MainWindow(QWidget *parent)
 		m_pSPort->setPortName( portName );
 		m_pPortLabel->setText( portName );
 	} );
-	connect( ui->mesLine, &QLineEdit::returnPressed, this, &MainWindow::slot_sendMess );
+	connect( ui->messLine, &QLineEdit::returnPressed, this, &MainWindow::slot_sendMess );
+	connect( ui->messLine, &QLineEdit::textChanged, this,  &MainWindow::slot_textChanged );
 	connect( ui->sendB, &QPushButton::clicked, this, &MainWindow::slot_sendMess );
+	connect( ui->inputModeHex, &QRadioButton::clicked, this, [this](){
+		ui->messLine->clear();
+		hexReMask(1);
+		ui->messLine->setFocus();
+	} );
+	connect( ui->inputModeAscii, &QRadioButton::clicked, this, [this](){
+		ui->messLine->clear();
+		ui->messLine->setInputMask("");
+		ui->messLine->setFocus();
+	} );
+
+	ui->messLine->setFocus();
 }
 
 MainWindow::~MainWindow()
@@ -69,17 +82,20 @@ void MainWindow::slot_readyRead()
 void MainWindow::slot_sendMess()
 {
 	QByteArray data;
-	auto text = ui->mesLine->text();
+	auto text = ui->messLine->text();
 	data.append( text );
 
-	if( text.indexOf("0x") == 0 ){
-		data.clear();
-		text = text.right( text.length() - 2 );
-		//for()
-		qDebug()<<text;
-	}
+	qDebug()<<data.toHex();
 
 	sendData( data );
+}
+
+void MainWindow::slot_textChanged(const QString &text)
+{
+	if( ui->inputModeHex->isChecked() ){
+		uint8_t num = text.length() / 3;
+		hexReMask( num + 1 );
+	}
 }
 
 void MainWindow::rescanPorts()
@@ -116,5 +132,16 @@ void MainWindow::sendData(const QByteArray &data)
 	if( !m_pSPort->isOpen() ) return;
 	if( data.size() == 0 ) return;
 	m_pSPort->write( data );
+}
+
+void MainWindow::hexReMask(uint8_t num)
+{
+	QString mask = ">";
+	for( uint8_t i = 0; i < num; i++ ) mask += "HH ";
+	mask += ";_";
+	if( ui->messLine->inputMask() != mask ){
+		ui->messLine->setInputMask(mask);
+		ui->messLine->setCursorPosition( ui->messLine->text().length() - 1 );
+	}
 }
 

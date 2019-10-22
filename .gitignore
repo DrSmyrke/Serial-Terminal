@@ -3,3 +3,6 @@
 bin
 build-*
 build
+.qmake.*
+Makefile
+Makefile.*

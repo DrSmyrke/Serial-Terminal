@@ -20,6 +20,7 @@ public:
 private slots:
 	void slot_readyRead();
 	void slot_sendMess();
+	void slot_textChanged(const QString &text);
 private:
 	Ui::MainWindow *ui;
 	QSerialPort* m_pSPort;
@@ -29,5 +30,6 @@ private:
 	void rescanPorts();
 	bool checkPort(const QString &port);
 	void sendData(const QByteArray &data);
+	void hexReMask(uint8_t num = 1);
 };
 #endif // MAINWINDOW_H
