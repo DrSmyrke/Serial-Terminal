@@ -10,6 +10,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 	m_pPortLabel = new QLabel(this);
 	m_pPortError = new QLabel(this);
+	m_pHexViewer = new HexViewer(this);
 
 	m_pSPort = new QSerialPort(this);
 		m_pSPort->setBaudRate( 9600 );
@@ -29,6 +30,7 @@ MainWindow::MainWindow(QWidget *parent)
 	ui->connectB->setText( tr( "OPEN" ) );
 	ui->statusbar->addWidget( m_pPortLabel );
 	ui->statusbar->addWidget( m_pPortError );
+	ui->scrollArea->setWidget( m_pHexViewer );
 
 	connect( ui->connectB, &QPushButton::clicked, this, [this](){
 		if( !m_pSPort->isOpen() ){
@@ -76,7 +78,7 @@ void MainWindow::slot_readyRead()
 	while( m_pSPort->bytesAvailable() ) buff.append( m_pSPort->readAll() );
 
 	qDebug()<<buff.toHex();
-	ui->logViewer->append( QString( buff.toHex() ) );
+	//ui->logViewer->append( QString( buff.toHex() ) );
 }
 
 void MainWindow::slot_sendMess()
@@ -88,6 +90,8 @@ void MainWindow::slot_sendMess()
 	qDebug()<<data.toHex();
 
 	sendData( data );
+
+	m_pHexViewer->appendData( data );
 }
 
 void MainWindow::slot_textChanged(const QString &text)

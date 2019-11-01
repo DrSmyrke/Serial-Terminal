@@ -5,6 +5,7 @@
 #include <QSerialPort>
 #include <QLabel>
 #include "global.h"
+#include "hexviewer.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -26,6 +27,7 @@ private:
 	QSerialPort* m_pSPort;
 	QLabel* m_pPortLabel;
 	QLabel* m_pPortError;
+	HexViewer* m_pHexViewer;
 
 	void rescanPorts();
 	bool checkPort(const QString &port);
