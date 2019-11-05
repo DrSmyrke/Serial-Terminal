@@ -28,14 +28,30 @@ void HexViewer::paintEvent(QPaintEvent *event)
 	p.setPen(pen);
 	p.drawLine(0,0,100,500);
 	p.drawRect(0,0,100,100);
-	p.setFont(QFont("Arial", 8, QFont::Bold));
-	QPen penHText(QColor("#00e0fc"));
+	p.setFont(QFont("://play-regular.ttf", 10, QFont::Bold));
 
+	QPen penHText(QColor("#000000"));
 	p.setPen(penHText);
-	for( uint16_t i = 0; i < m_buffer.size(); i++ ){
 
+	uint16_t x = 5;
+	uint16_t y = 15;
+	uint8_t ln = 0;
+
+	for( uint16_t i = 0; i < m_buffer.size(); i++ ){
 		auto sym = m_buffer.mid( i, 1 ).toHex();
-		p.drawText( 10, 10, QString(sym) );
+		p.drawText( x, y, QString(sym) );
+
+		x += 17;
+
+		if( ln == 7 ) x += 10;
+
+		if( ln >= 16 ){
+			y += 15;
+			x = 5;
+			ln = 0;
+		}
+
+		ln++;
 	}
 
 	Q_UNUSED( event )
