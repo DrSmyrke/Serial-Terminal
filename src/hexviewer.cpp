@@ -1,6 +1,7 @@
 #include "hexviewer.h"
 
 #include <QPainter>
+#include <QDebug>
 
 HexViewer::HexViewer(QWidget *parent)
 	: QWidget(parent)
@@ -32,6 +33,7 @@ void HexViewer::paintEvent(QPaintEvent *event)
 
 	p.setPen(penHText);
 	for( uint16_t i = 0; i < m_buffer.size(); i++ ){
+
 		auto sym = m_buffer.mid( i, 1 ).toHex();
 		p.drawText( 10, 10, QString(sym) );
 	}

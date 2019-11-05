@@ -92,6 +92,7 @@ void MainWindow::slot_sendMess()
 	sendData( data );
 
 	m_pHexViewer->appendData( data );
+	m_pHexViewer->update();
 }
 
 void MainWindow::slot_textChanged(const QString &text)

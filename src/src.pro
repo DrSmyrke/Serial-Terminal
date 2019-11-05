@@ -21,12 +21,13 @@ win32|win64{
 
 SOURCES += \
     global.cpp \
+    hexviewer.cpp \
     main.cpp \
-    mainwindow.cpp \
-    serialport.cpp
+    mainwindow.cpp
 
 HEADERS += \
     global.h \
+    hexviewer.h \
     mainwindow.h
 
 FORMS += \
