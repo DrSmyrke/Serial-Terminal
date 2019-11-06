@@ -32,7 +32,7 @@ MainWindow::MainWindow(QWidget *parent)
 	ui->statusbar->addWidget( m_pPortLabel );
 	ui->statusbar->addWidget( m_pPortError );
 	//ui->scrollArea->setWidgetResizable( true );
-	//ui->scrollArea->setWidget( m_pHexViewer );
+	ui->scrollArea->setWidget( m_pHexViewer );
 	//ui->scrollLayout->addWidget( m_pHexViewer );
 
 	connect( ui->connectB, &QPushButton::clicked, this, [this](){
@@ -89,15 +89,6 @@ void MainWindow::slot_sendMess()
 	auto text = ui->messLine->text();
 	data.append( text );
 	sendData( data );
-
-	m_pHexViewer->appendData( data );
-	//qDebug()<<m_pHexViewer->width()<<m_pHexViewer->height()<<m_pHexViewer->sizeHint();
-
-	//static uint16_t h = 200;
-
-	//h += 100;
-
-	//m_pHexViewer->resize( m_pHexViewer->width(), h );
 }
 
 void MainWindow::slot_textChanged(const QString &text)
