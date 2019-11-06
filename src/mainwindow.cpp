@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QSerialPortInfo>
+#include <QDebug>
 
 MainWindow::MainWindow(QWidget *parent)
 	: QMainWindow(parent)
@@ -30,7 +31,9 @@ MainWindow::MainWindow(QWidget *parent)
 	ui->connectB->setText( tr( "OPEN" ) );
 	ui->statusbar->addWidget( m_pPortLabel );
 	ui->statusbar->addWidget( m_pPortError );
-	ui->scrollArea->setWidget( m_pHexViewer );
+	//ui->scrollArea->setWidgetResizable( true );
+	//ui->scrollArea->setWidget( m_pHexViewer );
+	//ui->scrollLayout->addWidget( m_pHexViewer );
 
 	connect( ui->connectB, &QPushButton::clicked, this, [this](){
 		if( !m_pSPort->isOpen() ){
@@ -78,7 +81,6 @@ void MainWindow::slot_readyRead()
 	while( m_pSPort->bytesAvailable() ) buff.append( m_pSPort->readAll() );
 
 	m_pHexViewer->appendData( buff );
-	m_pHexViewer->update();
 }
 
 void MainWindow::slot_sendMess()
@@ -87,6 +89,15 @@ void MainWindow::slot_sendMess()
 	auto text = ui->messLine->text();
 	data.append( text );
 	sendData( data );
+
+	m_pHexViewer->appendData( data );
+	//qDebug()<<m_pHexViewer->width()<<m_pHexViewer->height()<<m_pHexViewer->sizeHint();
+
+	//static uint16_t h = 200;
+
+	//h += 100;
+
+	//m_pHexViewer->resize( m_pHexViewer->width(), h );
 }
 
 void MainWindow::slot_textChanged(const QString &text)

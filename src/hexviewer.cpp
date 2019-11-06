@@ -20,6 +20,8 @@ void HexViewer::appendData(const QByteArray &data)
 		uint16_t r = static_cast<uint16_t>( m_buffer.size() ) - m_bufferSize;
 		m_buffer.remove( 0, r );
 	}
+
+	this->update();
 }
 
 void HexViewer::paintEvent(QPaintEvent *event)
@@ -28,7 +30,7 @@ void HexViewer::paintEvent(QPaintEvent *event)
 	QString family = QFontDatabase::applicationFontFamilies(id).at(0);
 
 	QRect area = event->rect();
-	//qDebug()<<area<<event->region();
+	qDebug()<<area<<event->region()<<this->sizeHint();
 	uint16_t asciiX = static_cast<uint16_t>( area.width() ) - 200;
 	QPainter p(this);
 	QPen pen;
@@ -68,6 +70,10 @@ void HexViewer::paintEvent(QPaintEvent *event)
 
 		ln++;
 	}
+
+	//if( y < area.height() ) y = area.height();
+
+	//this->setGeometry( 0, 0, area.width(), y );
 
 	Q_UNUSED( event )
 }
