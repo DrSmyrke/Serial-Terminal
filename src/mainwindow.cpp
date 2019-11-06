@@ -1,6 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include <QDebug>
+#include <QSerialPortInfo>
 
 MainWindow::MainWindow(QWidget *parent)
 	: QMainWindow(parent)
@@ -77,8 +77,8 @@ void MainWindow::slot_readyRead()
 	QByteArray buff;
 	while( m_pSPort->bytesAvailable() ) buff.append( m_pSPort->readAll() );
 
-	qDebug()<<buff.toHex();
-	//ui->logViewer->append( QString( buff.toHex() ) );
+	m_pHexViewer->appendData( buff );
+	m_pHexViewer->update();
 }
 
 void MainWindow::slot_sendMess()
@@ -86,13 +86,7 @@ void MainWindow::slot_sendMess()
 	QByteArray data;
 	auto text = ui->messLine->text();
 	data.append( text );
-
-	qDebug()<<data.toHex();
-
 	sendData( data );
-
-	m_pHexViewer->appendData( data );
-	m_pHexViewer->update();
 }
 
 void MainWindow::slot_textChanged(const QString &text)
@@ -106,6 +100,11 @@ void MainWindow::slot_textChanged(const QString &text)
 void MainWindow::rescanPorts()
 {
 	ui->portBox->clear();
+	for( auto portInfo:QSerialPortInfo::availablePorts() ){
+		ui->portBox->addItem( portInfo.portName() );
+	}
+
+	/*
 #ifdef __linux__
 
 #elif _WIN32
@@ -114,6 +113,7 @@ void MainWindow::rescanPorts()
 		if( checkPort( str ) ) ui->portBox->addItem( str );
 	}
 #endif
+	*/
 }
 
 bool MainWindow::checkPort(const QString &port)

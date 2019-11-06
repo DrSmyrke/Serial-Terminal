@@ -2,6 +2,8 @@
 
 #include <QPainter>
 #include <QDebug>
+#include <QPaintEvent>
+#include <QFontDatabase>
 
 HexViewer::HexViewer(QWidget *parent)
 	: QWidget(parent)
@@ -22,32 +24,45 @@ void HexViewer::appendData(const QByteArray &data)
 
 void HexViewer::paintEvent(QPaintEvent *event)
 {
+	int id = QFontDatabase::addApplicationFont("://Terminus.ttf");
+	QString family = QFontDatabase::applicationFontFamilies(id).at(0);
+
+	QRect area = event->rect();
+	//qDebug()<<area<<event->region();
+	uint16_t asciiX = static_cast<uint16_t>( area.width() ) - 200;
 	QPainter p(this);
 	QPen pen;
 	pen.setColor(Qt::lightGray);
 	p.setPen(pen);
-	p.drawLine(0,0,100,500);
-	p.drawRect(0,0,100,100);
-	p.setFont(QFont("://play-regular.ttf", 10, QFont::Bold));
+	p.drawLine( asciiX, 0, asciiX, area.height() );
+	//p.drawRect(0,0,100,100);
+	p.setFont(QFont(family, 12, QFont::Normal));
 
 	QPen penHText(QColor("#000000"));
 	p.setPen(penHText);
 
 	uint16_t x = 5;
+	uint16_t ax = 5;
 	uint16_t y = 15;
-	uint8_t ln = 0;
+	uint8_t ln = 1;
 
 	for( uint16_t i = 0; i < m_buffer.size(); i++ ){
-		auto sym = m_buffer.mid( i, 1 ).toHex();
-		p.drawText( x, y, QString(sym) );
+		auto sym = m_buffer.mid( i, 1 );
+		p.drawText( x, y, QString(sym.toHex()) );
+		p.drawText( asciiX + ax, y, QString(sym) );
 
-		x += 17;
+		x += 20;
+		ax += 10;
 
-		if( ln == 7 ) x += 10;
+		if( ln == 8 ){
+			x += 10;
+			ax += 5;
+		}
 
 		if( ln >= 16 ){
 			y += 15;
 			x = 5;
+			ax = 5;
 			ln = 0;
 		}
 
