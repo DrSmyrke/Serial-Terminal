@@ -8,8 +8,11 @@
 HexViewer::HexViewer(QWidget *parent)
 	: QWidget(parent)
 	, m_bufferSize(65535)
+	, m_drawArea( 0, 0 )
 {
-
+	//setAttribute( Qt::WA_StaticContents );
+	//setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Expanding );
+	//qDebug()<<this->sizePolicy();
 }
 
 void HexViewer::appendData(const QByteArray &data)
@@ -24,13 +27,18 @@ void HexViewer::appendData(const QByteArray &data)
 	this->update();
 }
 
+QSize HexViewer::sizeHint() const
+{
+	return m_drawArea;
+}
+
 void HexViewer::paintEvent(QPaintEvent *event)
 {
 	int id = QFontDatabase::addApplicationFont("://Terminus.ttf");
 	QString family = QFontDatabase::applicationFontFamilies(id).at(0);
 
 	QRect area = event->rect();
-	qDebug()<<area<<event->region()<<this->sizeHint();
+	//qDebug()<<"HexViewer::paintEvent"<<area<<event->region();
 	uint16_t asciiX = static_cast<uint16_t>( area.width() ) - 200;
 	QPainter p(this);
 	QPen pen;
@@ -71,9 +79,7 @@ void HexViewer::paintEvent(QPaintEvent *event)
 		ln++;
 	}
 
-	//if( y < area.height() ) y = area.height();
-
-	//this->setGeometry( 0, 0, area.width(), y );
-
-	Q_UNUSED( event )
+	if( y < area.height() ) y = static_cast<uint16_t>( area.height() );
+	m_drawArea.setWidth( area.width() );
+	m_drawArea.setHeight( y );
 }

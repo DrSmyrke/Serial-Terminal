@@ -15,6 +15,53 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
+    <item row="0" column="6">
+     <widget class="QPushButton" name="connectB">
+      <property name="text">
+       <string>OPEN</string>
+      </property>
+      <property name="checkable">
+       <bool>false</bool>
+      </property>
+      <property name="flat">
+       <bool>false</bool>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="0" colspan="5">
+     <widget class="QLineEdit" name="messLine">
+      <property name="placeholderText">
+       <string>Send data</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="0" colspan="7">
+     <widget class="QScrollArea" name="scrollArea">
+      <property name="verticalScrollBarPolicy">
+       <enum>Qt::ScrollBarAlwaysOn</enum>
+      </property>
+      <property name="horizontalScrollBarPolicy">
+       <enum>Qt::ScrollBarAlwaysOff</enum>
+      </property>
+      <property name="sizeAdjustPolicy">
+       <enum>QAbstractScrollArea::AdjustToContents</enum>
+      </property>
+      <property name="widgetResizable">
+       <bool>true</bool>
+      </property>
+      <widget class="QWidget" name="scrollAreaWidgetContents">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>0</y>
+         <width>763</width>
+         <height>472</height>
+        </rect>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout"/>
+      </widget>
+     </widget>
+    </item>
     <item row="0" column="3">
      <widget class="QComboBox" name="speedBox">
       <property name="editable">
@@ -42,44 +89,10 @@
       </item>
      </widget>
     </item>
-    <item row="0" column="6">
-     <widget class="QPushButton" name="connectB">
-      <property name="text">
-       <string>OPEN</string>
-      </property>
-      <property name="checkable">
-       <bool>false</bool>
-      </property>
-      <property name="flat">
-       <bool>false</bool>
-      </property>
-     </widget>
-    </item>
-    <item row="3" column="6">
-     <widget class="QPushButton" name="sendB">
-      <property name="text">
-       <string>SEND</string>
-      </property>
-     </widget>
-    </item>
     <item row="0" column="1">
      <widget class="QComboBox" name="portBox">
       <property name="editable">
        <bool>false</bool>
-      </property>
-     </widget>
-    </item>
-    <item row="0" column="0">
-     <widget class="QLabel" name="label">
-      <property name="text">
-       <string>&lt;b&gt;Port:&lt;/b&gt;</string>
-      </property>
-     </widget>
-    </item>
-    <item row="3" column="0" colspan="5">
-     <widget class="QLineEdit" name="messLine">
-      <property name="placeholderText">
-       <string>Send data</string>
       </property>
      </widget>
     </item>
@@ -90,25 +103,14 @@
       </property>
      </widget>
     </item>
-    <item row="1" column="0" colspan="7">
-     <widget class="QScrollArea" name="scrollArea">
-      <property name="widgetResizable">
-       <bool>true</bool>
+    <item row="0" column="0">
+     <widget class="QLabel" name="label">
+      <property name="text">
+       <string>&lt;b&gt;Port:&lt;/b&gt;</string>
       </property>
-      <widget class="QWidget" name="scrollAreaWidgetContents">
-       <property name="geometry">
-        <rect>
-         <x>0</x>
-         <y>0</y>
-         <width>780</width>
-         <height>472</height>
-        </rect>
-       </property>
-       <layout class="QVBoxLayout" name="verticalLayout"/>
-      </widget>
      </widget>
     </item>
-    <item row="3" column="5">
+    <item row="2" column="5">
      <widget class="QGroupBox" name="groupBox">
       <property name="title">
        <string>Input method</string>
@@ -150,6 +152,13 @@
         </widget>
        </item>
       </layout>
+     </widget>
+    </item>
+    <item row="2" column="6">
+     <widget class="QPushButton" name="sendB">
+      <property name="text">
+       <string>SEND</string>
+      </property>
      </widget>
     </item>
    </layout>
