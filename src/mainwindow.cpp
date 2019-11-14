@@ -13,6 +13,7 @@ MainWindow::MainWindow(QWidget *parent)
 	m_pPortLabel = new QLabel(this);
 	m_pPortError = new QLabel(this);
 	m_pHexViewer = new HexViewer(this);
+		m_pHexViewer->setBlockSize( 8 );
 
 	m_pSPort = new QSerialPort(this);
 		m_pSPort->setBaudRate( 9600 );
@@ -103,7 +104,7 @@ void MainWindow::slot_sendMess()
 	data.append( text );
 	sendData( data );
 
-	m_pHexViewer->appendData( data );
+	//m_pHexViewer->appendData( data );
 	//ui->scrollArea->viewport()->resize( 1000, 1000 );
 	//qDebug()<<m_pHexViewer->size()<<m_pHexViewer->sizeHint();
 	//m_pHexViewer->resize( m_pHexViewer->sizeHint() );
