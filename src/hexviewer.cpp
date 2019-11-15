@@ -39,12 +39,13 @@ void HexViewer::appendData(const QByteArray &data)
 {
 	m_buffer.append( data );
 
-	if( m_buffer.size() > m_bufferSize ){
-		uint16_t r = static_cast<uint16_t>( m_buffer.size() ) - m_bufferSize;
-		m_buffer.remove( 0, r );
-	}
-
 	yRecount();
+
+	if( m_buffer.size() > m_bufferSize ){
+		uint16_t r = m_blocksCount * m_blockSize;
+		m_buffer.remove( 0, r );
+		yRecount();
+	}
 
 	this->update();
 	this->setMinimumHeight( m_yTotal );
