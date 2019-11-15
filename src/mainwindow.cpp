@@ -1,7 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QSerialPortInfo>
-#include <QDebug>
 
 
 MainWindow::MainWindow(QWidget *parent)
@@ -34,20 +33,6 @@ MainWindow::MainWindow(QWidget *parent)
 	ui->statusbar->addWidget( m_pPortLabel );
 	ui->statusbar->addWidget( m_pPortError );
 	ui->scrollArea->setWidget( m_pHexViewer );
-	//ui->verticalLayout_2->addWidget( m_pHexViewer );
-
-//	QStringListModel* model = new QStringListModel( this );
-//	model->insertColumns( 0, 2 );
-////	model->set
-//	model->setStringList( QStringList()<<"test1"<<"test2" );
-//	model->setStringList( QStringList()<<"test11"<<"test12" );
-
-//	auto index = model->index( 0, 0 );
-//	model->setData( index, "TEST" );
-//	index = model->index( 0, 1 );
-//	model->setData( index, "TEST2" );
-
-//	ui->listView->setModel( model );
 
 	connect( ui->connectB, &QPushButton::clicked, this, [this](){
 		if( !m_pSPort->isOpen() ){
@@ -80,6 +65,15 @@ MainWindow::MainWindow(QWidget *parent)
 		ui->messLine->setInputMask("");
 		ui->messLine->setFocus();
 	} );
+	connect( m_pHexViewer, &HexViewer::signal_customContextMenu, this, [this](const QPoint pos){
+		QMenu* menu = new QMenu(this);
+		QAction* clearA = new QAction(tr("Clear"), this);
+		connect(clearA, &QAction::triggered, this, [this](){
+			m_pHexViewer->clearData();
+		});
+		menu->addAction( clearA );
+		menu->popup( ui->scrollArea->viewport()->mapToGlobal( pos ) );
+	} );
 
 	ui->messLine->setFocus();
 }
@@ -105,10 +99,6 @@ void MainWindow::slot_sendMess()
 	sendData( data );
 
 	//m_pHexViewer->appendData( data );
-	//ui->scrollArea->viewport()->resize( 1000, 1000 );
-	//qDebug()<<m_pHexViewer->size()<<m_pHexViewer->sizeHint();
-	//m_pHexViewer->resize( m_pHexViewer->sizeHint() );
-	//m_pHexViewer->setGeometry( QRect(0,0, m_pHexViewer->sizeHint().width(), m_pHexViewer->sizeHint().height())  );
 }
 
 void MainWindow::slot_textChanged(const QString &text)

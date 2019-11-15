@@ -1,7 +1,6 @@
 #include "hexviewer.h"
 
 #include <QPainter>
-#include <QDebug>
 #include <QPaintEvent>
 #include <QFontDatabase>
 #include <QLayout>
@@ -51,6 +50,14 @@ void HexViewer::appendData(const QByteArray &data)
 	this->setMinimumHeight( m_yTotal );
 }
 
+void HexViewer::clearData()
+{
+	m_buffer.clear();
+	yRecount();
+	this->update();
+	this->setMinimumHeight( m_yTotal );
+}
+
 void HexViewer::yRecount()
 {
 	uint16_t width = static_cast<uint16_t>( this->width() );
@@ -77,13 +84,14 @@ void HexViewer::paintEvent(QPaintEvent *event)
 	QPen penHText(QColor("#000000"));
 	p.setPen(penHText);
 
+
 	uint16_t x = 5;
 	uint16_t ax = 5;
-	//uint16_t y = 15 + static_cast<uint16_t>( area.y() );
-	uint16_t y = 15;
+	uint16_t y = m_yStep;
+	//y += ( static_cast<uint16_t>( area.y() ) / m_yStep );
 	uint8_t ln = 1;
 	uint8_t bc = 0;
-	uint16_t iOffset = y / m_yStep;
+	//uint16_t iOffset = y / m_yStep;
 
 	//for( uint16_t i = iOffset; i < m_buffer.size(); i++ ){
 	for( uint16_t i = 0; i < m_buffer.size(); i++ ){
@@ -111,7 +119,7 @@ void HexViewer::paintEvent(QPaintEvent *event)
 		ln++;
 	}
 
-	if( y < area.height() ) y = static_cast<uint16_t>( area.height() );
+	//p.drawRect( area );
 }
 
 void HexViewer::resizeEvent(QResizeEvent *event)
@@ -119,4 +127,9 @@ void HexViewer::resizeEvent(QResizeEvent *event)
 	Q_UNUSED( event )
 	yRecount();
 	this->setMinimumHeight( m_yTotal );
+}
+
+void HexViewer::contextMenuEvent(QContextMenuEvent *event)
+{
+	signal_customContextMenu( event->pos() );
 }

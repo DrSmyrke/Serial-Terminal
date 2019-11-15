@@ -12,6 +12,9 @@ public:
 	void setBufferSize(uint16_t size){ m_bufferSize = size; }
 	void appendData(const QByteArray &data);
 	void setBlockSize(const uint8_t size){ m_blockSize = size; }
+	void clearData();
+signals:
+	void signal_customContextMenu(const QPoint &pos);
 private:
 	uint16_t m_bufferSize;
 	QByteArray m_buffer;
@@ -31,6 +34,7 @@ private:
 protected:
 	void paintEvent(QPaintEvent *event);
 	void resizeEvent(QResizeEvent *event);
+	void contextMenuEvent(QContextMenuEvent *event);
 };
 
 #endif // HEXVIEWER_H
