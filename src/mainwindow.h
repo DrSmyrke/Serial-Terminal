@@ -5,8 +5,7 @@
 #include <QSerialPort>
 #include <QLabel>
 #include "global.h"
-#include "hexviewer.h"
-#include "console.h"
+#include "consoleWidget.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -21,19 +20,17 @@ public:
 	~MainWindow();
 private slots:
 	void slot_readyRead();
-	void slot_sendMess();
-	void slot_textChanged(const QString &text);
 private:
 	Ui::MainWindow *ui;
 	QSerialPort* m_pSPort;
 	QLabel* m_pPortLabel;
 	QLabel* m_pPortError;
-	//HexViewer* m_pHexViewer;
-	Console* m_pConsole;
+	QLabel* m_pMode;
+	ConsoleWidget* m_pConsole;
 
 	void rescanPorts();
 	bool checkPort(const QString &port);
 	void sendData(const QByteArray &data);
-	void hexReMask(uint8_t num = 1);
+	void updateModeB();
 };
 #endif // MAINWINDOW_H

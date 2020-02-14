@@ -21,16 +21,14 @@ win32|win64{
 
 SOURCES += \
     global.cpp \
-    hexviewer.cpp \
     main.cpp \
     mainwindow.cpp \
-    console.cpp
+    consoleWidget.cpp
 
 HEADERS += \
     global.h \
-    hexviewer.h \
     mainwindow.h \
-    console.h
+    consoleWidget.h
 
 FORMS += \
     mainwindow.ui

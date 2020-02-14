@@ -1,16 +1,17 @@
-#include "console.h"
+#include "consoleWidget.h"
 #include <QScrollBar>
 #include <QTextBlock>
+//TODO: remove qdebug
+#include <QDebug>
 
-Console::Console(QWidget *parent)
-	: QPlainTextEdit(parent)
-	, m_prompt(">: ")
-	, m_locked(false)
-	, m_history()
-	, m_historyPos( -1 )
-	, m_hexInputMode(false)
-	, m_consoleMode(true)
+ConsoleWidget::ConsoleWidget(QWidget *parent) : QPlainTextEdit(parent)
 {
+	m_history		= QStringList();
+	m_historyPos	= -1;
+	m_consoleMode	= false;
+	m_hexInputMode	= false;
+	m_prompt		= ">: ";
+
 	QPalette p = this->palette();
 	p.setColor(QPalette::Base, Qt::black);
 	p.setColor(QPalette::Text, Qt::green);
@@ -21,7 +22,7 @@ Console::Console(QWidget *parent)
 
 	QFont font;
 	font.setFamily( family );
-	font.setPointSize( 12 );
+	//font.setPointSize( 12 );
 	font.setWeight( QFont::Normal );
 
 	this->setFont( font );
@@ -29,26 +30,44 @@ Console::Console(QWidget *parent)
 	insertPrompt( false );
 }
 
-void Console::output(const QString &text)
+void ConsoleWidget::output(const QString &text)
 {
-	this->textCursor().insertBlock();
 	QTextCharFormat format;
 	format.setForeground(Qt::gray);
-	this->textCursor().setBlockCharFormat(format);
-	this->textCursor().insertText( text );
+
+	if( !m_consoleMode ){
+		this->textCursor().insertBlock();
+		this->textCursor().setBlockCharFormat(format);
+		this->textCursor().insertText( text );
+	}else{
+		this->textCursor().setBlockCharFormat(format);
+		for( uint32_t i = 0; i < text.length(); i++ ){
+			if( text[i] == "\r" ){
+				continue;
+			}
+			if( text[i] == "\b" ){
+				backSpace();
+				continue;
+			}
+
+			this->textCursor().insertText( text[i] );
+		}
+	}
+
 
 	format.setForeground(Qt::green);
 	this->textCursor().setBlockCharFormat(format);
 
+	qDebug()<<"<:"<<text;
+
 	if( m_consoleMode ){
-		m_locked = false;
 		scrollDown();
 	}else{
 		insertPrompt();
 	}
 }
 
-void Console::insertPrompt(bool insertNewBlock)
+void ConsoleWidget::insertPrompt(bool insertNewBlock)
 {
 	if(insertNewBlock){
 		this->textCursor().insertBlock();
@@ -62,7 +81,7 @@ void Console::insertPrompt(bool insertNewBlock)
 	scrollDown();
 }
 
-void Console::onEnter()
+void ConsoleWidget::onEnter()
 {
 	//TODO: Сделать отправку Enter
 	if(this->textCursor().positionInBlock() == m_prompt.length()){
@@ -94,22 +113,18 @@ void Console::onEnter()
 		cmdBuf.append( cmd );
 	}
 
-	if( m_consoleMode ){
-		m_locked = true;
-	}
-
 	if( cmdBuf.size() > 0 ){
 		emit signal_onCommand( cmdBuf );
 	}
 }
 
-void Console::historyAdd(const QString &cmd)
+void ConsoleWidget::historyAdd(const QString &cmd)
 {
 	m_history.append(cmd);
 	m_historyPos = m_history.length();
 }
 
-void Console::historyBack()
+void ConsoleWidget::historyBack()
 {
 	if( m_historyPos <= 0 ){
 		return;
@@ -123,7 +138,7 @@ void Console::historyBack()
 	m_historyPos--;
 }
 
-void Console::historyForward()
+void ConsoleWidget::historyForward()
 {
 	if(m_historyPos == m_history.length()){
 		return;
@@ -140,13 +155,13 @@ void Console::historyForward()
 	m_historyPos++;
 }
 
-void Console::scrollDown()
+void ConsoleWidget::scrollDown()
 {
 	QScrollBar *vbar = this->verticalScrollBar();
 	vbar->setValue( vbar->maximum() );
 }
 
-void Console::checkHexModeRazrjad()
+void ConsoleWidget::checkHexModeRazrjad()
 {
 	if( !m_hexInputMode ) return;
 
@@ -161,16 +176,47 @@ void Console::checkHexModeRazrjad()
 	}
 }
 
-void Console::mousePressEvent(QMouseEvent *event)
+void ConsoleWidget::backSpace()
 {
+	this->textCursor().deletePreviousChar();
+}
+
+void ConsoleWidget::setMode(const uint8_t mode)
+{
+	switch (mode) {
+		case ConsoleWidget::Mode::terminal:
+			m_consoleMode = false;
+			emit signal_modeChange( tr("terminal") );
+		break;
+		case ConsoleWidget::Mode::console:
+			m_consoleMode = true;
+			emit signal_modeChange( tr("console") );
+		break;
+	}
+}
+
+void ConsoleWidget::mousePressEvent(QMouseEvent *event)
+{
+	Q_UNUSED(event)
 	this->setFocus();
 }
 
-void Console::keyPressEvent(QKeyEvent *event)
+void ConsoleWidget::mouseDoubleClickEvent(QMouseEvent *event)
 {
-	if( m_locked ){
+	Q_UNUSED(event)
+}
+
+void ConsoleWidget::keyPressEvent(QKeyEvent *event)
+{
+	if( m_consoleMode ){
+		//QPlainTextEdit::keyPressEvent(event);
+		QByteArray data;
+		data.append( event->text().toUtf8() );
+		qDebug()<<event<<data.toHex()<<data;
+		emit signal_onCommand( data );
 		return;
 	}
+
 	//m_hexInputModeinsertPrompt();
 
 	if( m_hexInputMode ){
@@ -229,4 +275,9 @@ void Console::keyPressEvent(QKeyEvent *event)
 	if(event->key() == Qt::Key_Down && event->modifiers() == Qt::NoModifier){
 		historyForward();
 	}
+}
+
+void ConsoleWidget::contextMenuEvent(QContextMenuEvent *event)
+{
+	Q_UNUSED(event)
 }

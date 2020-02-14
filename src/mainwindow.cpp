@@ -11,9 +11,8 @@ MainWindow::MainWindow(QWidget *parent)
 
 	m_pPortLabel = new QLabel(this);
 	m_pPortError = new QLabel(this);
-//	m_pHexViewer = new HexViewer(this);
-//		m_pHexViewer->setBlockSize( 8 );
-	m_pConsole = new Console( this );
+	m_pMode = new QLabel(this);
+	m_pConsole = new ConsoleWidget( this );
 
 	m_pSPort = new QSerialPort(this);
 		m_pSPort->setBaudRate( 115200 );
@@ -33,7 +32,7 @@ MainWindow::MainWindow(QWidget *parent)
 	ui->connectB->setText( tr( "OPEN" ) );
 	ui->statusbar->addWidget( m_pPortLabel );
 	ui->statusbar->addWidget( m_pPortError );
-	//ui->scrollArea->setWidget( m_pHexViewer );
+	ui->statusbar->addWidget( m_pMode );
 	ui->scrollArea->setWidget( m_pConsole );
 
 	connect( ui->connectB, &QPushButton::clicked, this, [this](){
@@ -42,6 +41,8 @@ MainWindow::MainWindow(QWidget *parent)
 				ui->connectB->setText( tr( "CLOSE" ) );
 				ui->speedBox->setEnabled( false );
 				ui->portBox->setEnabled( false );
+				m_pPortError->setText( QString("%1-%2-%3-%4").arg( m_pSPort->baudRate() ).arg( m_pSPort->dataBits() ).arg( m_pSPort->parity() ).arg( m_pSPort->stopBits() ) );
+				m_pConsole->setFocus();
 			}else{
 				m_pPortError->setText( m_pSPort->errorString() );
 			}
@@ -51,6 +52,7 @@ MainWindow::MainWindow(QWidget *parent)
 				ui->connectB->setText( tr( "OPEN" ) );
 				ui->speedBox->setEnabled( true );
 				ui->portBox->setEnabled( true );
+				m_pPortError->clear();
 			}
 		}
 	} );
@@ -59,19 +61,6 @@ MainWindow::MainWindow(QWidget *parent)
 	connect( ui->portBox, &QComboBox::currentTextChanged, this, [this](const QString &portName){
 		m_pSPort->setPortName( portName );
 		m_pPortLabel->setText( portName );
-	} );
-	connect( ui->messLine, &QLineEdit::returnPressed, this, &MainWindow::slot_sendMess );
-	connect( ui->messLine, &QLineEdit::textChanged, this,  &MainWindow::slot_textChanged );
-	connect( ui->sendB, &QPushButton::clicked, this, &MainWindow::slot_sendMess );
-	connect( ui->inputModeHex, &QRadioButton::clicked, this, [this](){
-		ui->messLine->clear();
-		hexReMask(1);
-		ui->messLine->setFocus();
-	} );
-	connect( ui->inputModeAscii, &QRadioButton::clicked, this, [this](){
-		ui->messLine->clear();
-		ui->messLine->setInputMask("");
-		ui->messLine->setFocus();
 	} );
 
 	connect( ui->speedBox, &QComboBox::currentTextChanged, this, [this](const QString &speed){
@@ -82,17 +71,7 @@ MainWindow::MainWindow(QWidget *parent)
 		}
 	} );
 
-//	connect( m_pHexViewer, &HexViewer::signal_customContextMenu, this, [this](const QPoint pos){
-//		QMenu* menu = new QMenu(this);
-//		QAction* clearA = new QAction(tr("Clear"), this);
-//		connect(clearA, &QAction::triggered, this, [this](){
-//			m_pHexViewer->clearData();
-//		});
-//		menu->addAction( clearA );
-//		menu->popup( ui->scrollArea->viewport()->mapToGlobal( pos ) );
-//	} );
-
-	connect( m_pConsole, &Console::signal_onCommand, this, [this](const QByteArray &cmd){
+	connect( m_pConsole, &ConsoleWidget::signal_onCommand, this, [this](const QByteArray &cmd){
 		if( cmd == "help" ){
 			m_pConsole->output( "====== HELP MENU ========\nmode input hex\nmode input ascii" );
 			return;
@@ -100,8 +79,25 @@ MainWindow::MainWindow(QWidget *parent)
 		sendData( cmd );
 	} );
 
-	//ui->messLine->setFocus();
+	connect( m_pConsole, &ConsoleWidget::signal_modeChange, this, [this](const QString &text){
+		m_pMode->setText( QString("Mode: %1").arg( text ) );
+	} );
+
+	connect( ui->modeB, &QPushButton::clicked, this, [this](){
+		if( m_pConsole->isConsole() ){
+			m_pConsole->setMode( ConsoleWidget::Mode::terminal );
+		}else{
+			m_pConsole->setMode( ConsoleWidget::Mode::console );
+		}
+		m_pConsole->output( "\r\n====== MODE CHANGE ========\r\n" );
+		updateModeB();
+		m_pConsole->setFocus();
+	} );
+
+	//configure
 	m_pConsole->setFocus();
+	m_pConsole->setMode( ConsoleWidget::Mode::terminal );
+	updateModeB();
 }
 
 MainWindow::~MainWindow()
@@ -114,26 +110,7 @@ void MainWindow::slot_readyRead()
 	QByteArray buff;
 	while( m_pSPort->bytesAvailable() ) buff.append( m_pSPort->readAll() );
 
-//	m_pHexViewer->appendData( buff );
 	m_pConsole->output( buff );
-}
-
-void MainWindow::slot_sendMess()
-{
-	QByteArray data;
-	auto text = ui->messLine->text();
-	data.append( text );
-	sendData( data );
-
-	//m_pHexViewer->appendData( data );
-}
-
-void MainWindow::slot_textChanged(const QString &text)
-{
-	if( ui->inputModeHex->isChecked() ){
-		uint8_t num = text.length() / 3;
-		hexReMask( num + 1 );
-	}
 }
 
 void MainWindow::rescanPorts()
@@ -181,14 +158,11 @@ void MainWindow::sendData(const QByteArray &data)
 	m_pSPort->write( data );
 }
 
-void MainWindow::hexReMask(uint8_t num)
+void MainWindow::updateModeB()
 {
-	QString mask = ">";
-	for( uint8_t i = 0; i < num; i++ ) mask += "HH ";
-	mask += ";_";
-	if( ui->messLine->inputMask() != mask ){
-		ui->messLine->setInputMask(mask);
-		ui->messLine->setCursorPosition( ui->messLine->text().length() - 1 );
+	if( m_pConsole->isConsole() ){
+		ui->modeB->setText( tr("Console") );
+	}else{
+		ui->modeB->setText( tr("Terminal") );
 	}
 }
-
