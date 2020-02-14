@@ -1,8 +1,6 @@
 #include "consoleWidget.h"
 #include <QScrollBar>
 #include <QTextBlock>
-//TODO: remove qdebug
-#include <QDebug>
 
 ConsoleWidget::ConsoleWidget(QWidget *parent) : QPlainTextEdit(parent)
 {
@@ -41,7 +39,7 @@ void ConsoleWidget::output(const QString &text)
 		this->textCursor().insertText( text );
 	}else{
 		this->textCursor().setBlockCharFormat(format);
-		for( uint32_t i = 0; i < text.length(); i++ ){
+		for( int32_t i = 0; i < text.length(); i++ ){
 			if( text[i] == "\r" ){
 				continue;
 			}
@@ -57,8 +55,6 @@ void ConsoleWidget::output(const QString &text)
 
 	format.setForeground(Qt::green);
 	this->textCursor().setBlockCharFormat(format);
-
-	qDebug()<<"<:"<<text;
 
 	if( m_consoleMode ){
 		scrollDown();
@@ -83,7 +79,6 @@ void ConsoleWidget::insertPrompt(bool insertNewBlock)
 
 void ConsoleWidget::onEnter()
 {
-	//TODO: Сделать отправку Enter
 	if(this->textCursor().positionInBlock() == m_prompt.length()){
 		insertPrompt();
 		return;
@@ -209,15 +204,11 @@ void ConsoleWidget::mouseDoubleClickEvent(QMouseEvent *event)
 void ConsoleWidget::keyPressEvent(QKeyEvent *event)
 {
 	if( m_consoleMode ){
-		//QPlainTextEdit::keyPressEvent(event);
 		QByteArray data;
 		data.append( event->text().toUtf8() );
-		qDebug()<<event<<data.toHex()<<data;
 		emit signal_onCommand( data );
 		return;
 	}
-
-	//m_hexInputModeinsertPrompt();
 
 	if( m_hexInputMode ){
 		if(event->key() == Qt::Key_Space) return;
