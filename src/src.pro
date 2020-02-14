@@ -23,18 +23,19 @@ SOURCES += \
     global.cpp \
     hexviewer.cpp \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    console.cpp
 
 HEADERS += \
     global.h \
     hexviewer.h \
-    mainwindow.h
+    mainwindow.h \
+    console.h
 
 FORMS += \
     mainwindow.ui
 
-RESOURCES += resources.qrc \
-    resources.qrc
+RESOURCES += resources.qrc
 
 TRANSLATIONS = lang/ru_RU.ts
 
