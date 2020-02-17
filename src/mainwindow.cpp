@@ -41,7 +41,7 @@ MainWindow::MainWindow(QWidget *parent)
 				ui->connectB->setText( tr( "CLOSE" ) );
 				ui->speedBox->setEnabled( false );
 				ui->portBox->setEnabled( false );
-				m_pPortError->setText( QString("%1-%2-%3-%4").arg( m_pSPort->baudRate() ).arg( m_pSPort->dataBits() ).arg( m_pSPort->parity() ).arg( m_pSPort->stopBits() ) );
+				setConfigString();
 				m_pConsole->setFocus();
 			}else{
 				m_pPortError->setText( m_pSPort->errorString() );
@@ -165,4 +165,23 @@ void MainWindow::updateModeB()
 	}else{
 		ui->modeB->setText( tr("Terminal") );
 	}
+}
+
+void MainWindow::setConfigString()
+{
+	QString str = QString("%1-%2-").arg( m_pSPort->baudRate() ).arg( m_pSPort->dataBits() );
+
+	switch ( m_pSPort->parity() ) {
+		case QSerialPort::Parity::NoParity:		str += "N";	break;
+		case QSerialPort::Parity::EvenParity:	str += "E";	break;
+		case QSerialPort::Parity::OddParity:	str += "O";	break;
+		case QSerialPort::Parity::SpaceParity:	str += "S";	break;
+		case QSerialPort::Parity::MarkParity:	str += "M";	break;
+		default:	str += "U";	break;
+	}
+
+	str += "-";
+	str += QString::number( m_pSPort->stopBits() );
+
+	m_pPortError->setText( str );
 }

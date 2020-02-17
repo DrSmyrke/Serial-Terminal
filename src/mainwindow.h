@@ -32,5 +32,6 @@ private:
 	bool checkPort(const QString &port);
 	void sendData(const QByteArray &data);
 	void updateModeB();
+	void setConfigString();
 };
 #endif // MAINWINDOW_H
