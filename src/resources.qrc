@@ -1,6 +1,6 @@
 <RCC>
     <qresource prefix="/">
         <file>index.ico</file>
-        <file>Terminus.ttf</file>
+        <file>Play-Regular.ttf</file>
     </qresource>
 </RCC>

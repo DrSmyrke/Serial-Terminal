@@ -15,13 +15,21 @@ ConsoleWidget::ConsoleWidget(QWidget *parent) : QPlainTextEdit(parent)
 	p.setColor(QPalette::Text, Qt::green);
 	setPalette(p);
 
-	int id = QFontDatabase::addApplicationFont("://Terminus.ttf");
-	QString family = QFontDatabase::applicationFontFamilies(id).at(0);
 
 	QFont font;
+
+#ifdef __linux__
+
+#elif _WIN32
+
+#endif
+
+	int id = QFontDatabase::addApplicationFont("://Play-Regular.ttf");
+	QString family = QFontDatabase::applicationFontFamilies(id).at(0);
 	font.setFamily( family );
-	//font.setPointSize( 12 );
+	font.setPointSize( 11 );
 	font.setWeight( QFont::Normal );
+	font.setStyleHint( QFont::Monospace, QFont::PreferAntialias );
 
 	this->setFont( font );
 
