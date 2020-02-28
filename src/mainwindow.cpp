@@ -67,6 +67,7 @@ MainWindow::MainWindow(QWidget *parent)
 	connect( ui->hexB, &QPushButton::toggled, this, [this](bool checked){
 		m_pConsole->setFocus();
 		if( checked ){
+			m_pHexConsole->clear();
 			m_pHexConsole->show();
 		}else{
 			m_pHexConsole->hide();
@@ -132,7 +133,9 @@ void MainWindow::slot_readyRead()
 	while( m_pSPort->bytesAvailable() ) buff.append( m_pSPort->readAll() );
 
 	m_pConsole->output( buff );
-	m_pHexConsole->output( buff.toHex() );
+	if( !m_pHexConsole->isHidden() ){
+		m_pHexConsole->output( buff.toHex() );
+	}
 }
 
 void MainWindow::rescanPorts()
@@ -174,9 +177,6 @@ void MainWindow::sendData(const QByteArray &data)
 {
 	if( !m_pSPort->isOpen() ){
 		m_pConsole->output( "Port is NOT open" );
-		QByteArray ba;
-		ba.append( "123" );
-		m_pHexConsole->output( ba.toHex() );
 		return;
 	}
 	if( data.size() == 0 ) return;
