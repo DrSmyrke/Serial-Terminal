@@ -8,7 +8,9 @@ ConsoleWidget::ConsoleWidget(QWidget *parent) : QPlainTextEdit(parent)
 	m_historyPos	= -1;
 	m_consoleMode	= false;
 	m_hexInputMode	= false;
+	m_viewOnlyMode	= false;
 	m_prompt		= ">: ";
+	m_hexSymCounter	= 0;
 
 	QPalette p = this->palette();
 	p.setColor(QPalette::Base, Qt::black);
@@ -35,7 +37,7 @@ ConsoleWidget::ConsoleWidget(QWidget *parent) : QPlainTextEdit(parent)
 
 	insertPrompt( false );
 }
-
+#include <QDebug>
 void ConsoleWidget::output(const QString &text)
 {
 	QTextCharFormat format;
@@ -57,6 +59,10 @@ void ConsoleWidget::output(const QString &text)
 			}
 
 			this->textCursor().insertText( text[i] );
+			if( m_hexInputMode && m_hexSymCounter++ == 1 ){
+				m_hexSymCounter = 0;
+				this->textCursor().insertText( " " );
+			}
 		}
 	}
 
@@ -87,6 +93,9 @@ void ConsoleWidget::insertPrompt(bool insertNewBlock)
 
 void ConsoleWidget::onEnter()
 {
+	if( m_viewOnlyMode ){
+		return;
+	}
 	if(this->textCursor().positionInBlock() == m_prompt.length()){
 		insertPrompt();
 		return;
@@ -174,6 +183,10 @@ void ConsoleWidget::checkHexModeRazrjad()
 		cmd.remove( 0, 2 );
 	}
 
+	if( cmd.length() == 0 ){
+		return;
+	}
+
 	if( cmd.replace(" ","").length() % 2 == 0 ){
 		this->textCursor().insertText( " " );
 	}
@@ -201,16 +214,25 @@ void ConsoleWidget::setMode(const uint8_t mode)
 void ConsoleWidget::mousePressEvent(QMouseEvent *event)
 {
 	Q_UNUSED(event)
+	if( m_viewOnlyMode ){
+		return;
+	}
 	this->setFocus();
 }
 
 void ConsoleWidget::mouseDoubleClickEvent(QMouseEvent *event)
 {
 	Q_UNUSED(event)
+	if( m_viewOnlyMode ){
+		return;
+	}
 }
 
 void ConsoleWidget::keyPressEvent(QKeyEvent *event)
 {
+	if( m_viewOnlyMode ){
+		return;
+	}
 	if( m_consoleMode ){
 		QByteArray data;
 		data.append( event->text().toUtf8() );

@@ -20,6 +20,8 @@ public:
 	void setMode(const uint8_t mode);
 	bool isConsole(){ return m_consoleMode; }
 	void insertPrompt(bool insertNewBlock = true);
+	void setViewOnlyMode(bool viewOnly = true){ m_viewOnlyMode = viewOnly; }
+	void setViewHexOnly(bool viewHexOnly = true){ m_hexInputMode = viewHexOnly; }
 signals:
 	void signal_onCommand(const QByteArray &cmd);
 	void signal_modeChange(const QString &mode);
@@ -29,6 +31,8 @@ private:
 	int m_historyPos;
 	bool m_hexInputMode;
 	bool m_consoleMode;
+	bool m_viewOnlyMode;
+	uint8_t m_hexSymCounter;
 
 	void onEnter();
 	void historyAdd(const QString &cmd);

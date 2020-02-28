@@ -115,6 +115,9 @@ MainWindow::MainWindow(QWidget *parent)
 	m_pConsole->setMode( ConsoleWidget::Mode::terminal );
 	m_pHexConsole->hide();
 	m_pHexConsole->setMode( ConsoleWidget::Mode::console );
+	m_pHexConsole->output( "\n" );
+	m_pHexConsole->setViewOnlyMode( true );
+	m_pHexConsole->setViewHexOnly( true );
 	updateModeB();
 }
 
@@ -129,6 +132,7 @@ void MainWindow::slot_readyRead()
 	while( m_pSPort->bytesAvailable() ) buff.append( m_pSPort->readAll() );
 
 	m_pConsole->output( buff );
+	m_pHexConsole->output( buff.toHex() );
 }
 
 void MainWindow::rescanPorts()
@@ -170,6 +174,9 @@ void MainWindow::sendData(const QByteArray &data)
 {
 	if( !m_pSPort->isOpen() ){
 		m_pConsole->output( "Port is NOT open" );
+		QByteArray ba;
+		ba.append( "123" );
+		m_pHexConsole->output( ba.toHex() );
 		return;
 	}
 	if( data.size() == 0 ) return;
