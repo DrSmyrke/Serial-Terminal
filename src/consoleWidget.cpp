@@ -37,7 +37,7 @@ ConsoleWidget::ConsoleWidget(QWidget *parent) : QPlainTextEdit(parent)
 
 	insertPrompt( false );
 }
-#include <QDebug>
+
 void ConsoleWidget::output(const QString &text)
 {
 	QTextCharFormat format;
