@@ -34,6 +34,7 @@ MainWindow::MainWindow(QWidget *parent)
 	ui->statusbar->addWidget( m_pPortError );
 	ui->statusbar->addWidget( m_pMode );
 	ui->scrollArea->setWidget( m_pConsole );
+	ui->clearB->setIcon( this->style()->standardIcon(QStyle::SP_LineEditClearButton) );
 
 	connect( ui->connectB, &QPushButton::clicked, this, [this](){
 		if( !m_pSPort->isOpen() ){
@@ -55,6 +56,11 @@ MainWindow::MainWindow(QWidget *parent)
 				m_pPortError->clear();
 			}
 		}
+	} );
+	connect( ui->clearB, &QPushButton::clicked, this, [this](){
+		m_pConsole->clear();
+		m_pConsole->insertPrompt( false );
+		m_pConsole->setFocus();
 	} );
 
 	connect( m_pSPort, &QSerialPort::readyRead, this, &MainWindow::slot_readyRead );

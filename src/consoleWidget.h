@@ -19,6 +19,7 @@ public:
 	void output(const QString &text);
 	void setMode(const uint8_t mode);
 	bool isConsole(){ return m_consoleMode; }
+	void insertPrompt(bool insertNewBlock = true);
 signals:
 	void signal_onCommand(const QByteArray &cmd);
 	void signal_modeChange(const QString &mode);
@@ -29,7 +30,6 @@ private:
 	bool m_hexInputMode;
 	bool m_consoleMode;
 
-	void insertPrompt(bool insertNewBlock = true);
 	void onEnter();
 	void historyAdd(const QString &cmd);
 	void historyBack();

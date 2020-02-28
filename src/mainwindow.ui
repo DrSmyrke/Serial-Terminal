@@ -22,7 +22,7 @@
       </property>
      </widget>
     </item>
-    <item row="3" column="0" colspan="6">
+    <item row="3" column="0" colspan="7">
      <widget class="QScrollArea" name="scrollArea">
       <property name="widgetResizable">
        <bool>true</bool>
@@ -33,14 +33,14 @@
          <x>0</x>
          <y>0</y>
          <width>780</width>
-         <height>502</height>
+         <height>494</height>
         </rect>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout"/>
       </widget>
      </widget>
     </item>
-    <item row="0" column="5">
+    <item row="0" column="6">
      <widget class="QPushButton" name="connectB">
       <property name="text">
        <string>OPEN</string>
@@ -107,6 +107,13 @@
       </item>
      </widget>
     </item>
+    <item row="0" column="5">
+     <widget class="QPushButton" name="clearB">
+      <property name="text">
+       <string>CLEAR</string>
+      </property>
+     </widget>
+    </item>
    </layout>
   </widget>
   <widget class="QMenuBar" name="menubar">
@@ -115,7 +122,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>22</height>
+     <height>26</height>
     </rect>
    </property>
   </widget>
