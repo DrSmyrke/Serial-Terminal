@@ -27,6 +27,7 @@ private:
 	QLabel* m_pPortError;
 	QLabel* m_pMode;
 	ConsoleWidget* m_pConsole;
+	ConsoleWidget* m_pHexConsole;
 
 	void rescanPorts();
 	bool checkPort(const QString &port);

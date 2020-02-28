@@ -13,6 +13,7 @@ MainWindow::MainWindow(QWidget *parent)
 	m_pPortError = new QLabel(this);
 	m_pMode = new QLabel(this);
 	m_pConsole = new ConsoleWidget( this );
+	m_pHexConsole = new ConsoleWidget( this );
 
 	m_pSPort = new QSerialPort(this);
 		m_pSPort->setBaudRate( 115200 );
@@ -33,7 +34,8 @@ MainWindow::MainWindow(QWidget *parent)
 	ui->statusbar->addWidget( m_pPortLabel );
 	ui->statusbar->addWidget( m_pPortError );
 	ui->statusbar->addWidget( m_pMode );
-	ui->scrollArea->setWidget( m_pConsole );
+	ui->vBox->addWidget( m_pConsole );
+	ui->vBox->addWidget( m_pHexConsole );
 	ui->clearB->setIcon( this->style()->standardIcon(QStyle::SP_LineEditClearButton) );
 
 	connect( ui->connectB, &QPushButton::clicked, this, [this](){
@@ -61,6 +63,14 @@ MainWindow::MainWindow(QWidget *parent)
 		m_pConsole->clear();
 		m_pConsole->insertPrompt( false );
 		m_pConsole->setFocus();
+	} );
+	connect( ui->hexB, &QPushButton::toggled, this, [this](bool checked){
+		m_pConsole->setFocus();
+		if( checked ){
+			m_pHexConsole->show();
+		}else{
+			m_pHexConsole->hide();
+		}
 	} );
 
 	connect( m_pSPort, &QSerialPort::readyRead, this, &MainWindow::slot_readyRead );
@@ -103,6 +113,8 @@ MainWindow::MainWindow(QWidget *parent)
 	//configure
 	m_pConsole->setFocus();
 	m_pConsole->setMode( ConsoleWidget::Mode::terminal );
+	m_pHexConsole->hide();
+	m_pHexConsole->setMode( ConsoleWidget::Mode::console );
 	updateModeB();
 }
 
