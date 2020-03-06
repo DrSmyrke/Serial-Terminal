@@ -57,6 +57,7 @@ MainWindow::MainWindow(QWidget *parent)
 				ui->portBox->setEnabled( true );
 				m_pPortError->clear();
 			}
+			rescanPorts();
 		}
 	} );
 	connect( ui->clearB, &QPushButton::clicked, this, [this](){
@@ -97,7 +98,7 @@ MainWindow::MainWindow(QWidget *parent)
 	} );
 
 	connect( m_pConsole, &ConsoleWidget::signal_modeChange, this, [this](const QString &text){
-		m_pMode->setText( QString("Mode: %1").arg( text ) );
+		m_pMode->setText( QString( tr("Mode: %1") ).arg( text ) );
 	} );
 
 	connect( ui->modeB, &QPushButton::clicked, this, [this](){

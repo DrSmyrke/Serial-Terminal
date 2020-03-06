@@ -37,7 +37,6 @@ RESOURCES += resources.qrc
 
 TRANSLATIONS = lang/ru_RU.ts
 
-
 exists(./gitversion.pri):include(./gitversion.pri)
 exists(./myLibs.pri):include(./myLibs.pri)
 
@@ -45,6 +44,3 @@ exists(./myLibs.pri):include(./myLibs.pri)
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
-
-DISTFILES += \
-    gitversion.pri

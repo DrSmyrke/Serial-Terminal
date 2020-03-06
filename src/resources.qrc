@@ -2,5 +2,6 @@
     <qresource prefix="/">
         <file>index.ico</file>
         <file>Play-Regular.ttf</file>
+        <file>lang/ru_RU.qm</file>
     </qresource>
 </RCC>

@@ -2,154 +2,96 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="ru_RU">
 <context>
-    <name>JavaScriptObj</name>
+    <name>ConsoleWidget</name>
     <message>
-        <source>Import bookmarks</source>
-        <translation>Импорт закладок</translation>
+        <location filename="../consoleWidget.cpp" line="205"/>
+        <source>terminal</source>
+        <translation>терминал</translation>
     </message>
     <message>
-        <source>Bookmarks Files (*.json *.html)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>The path to save files</source>
-        <translation type="unfinished"></translation>
+        <location filename="../consoleWidget.cpp" line="209"/>
+        <source>console</source>
+        <translation>консоль</translation>
     </message>
 </context>
 <context>
     <name>MainWindow</name>
     <message>
-        <source>Find text</source>
-        <translation>Найти текст</translation>
-    </message>
-    <message>
-        <source>New Tab</source>
-        <translation>Новая вкладка</translation>
-    </message>
-    <message>
-        <source>Print Document</source>
-        <translation>Печать документа</translation>
-    </message>
-</context>
-<context>
-    <name>QObject</name>
-    <message>
-        <source>Show home page</source>
-        <translation>Показать домашнюю страницу</translation>
-    </message>
-    <message>
-        <source>Show blank page</source>
-        <translation>Показать постую страницу</translation>
-    </message>
-    <message>
-        <source>Show tabs opened last time</source>
-        <translation>Показать вкладки открытые в прошлый раз</translation>
-    </message>
-    <message>
-        <source>Starting</source>
-        <translation>Запуск</translation>
-    </message>
-    <message>
-        <source>At startup:</source>
-        <translation>При запуске:</translation>
-    </message>
-    <message>
-        <source>Home page:</source>
-        <translation>Домашняя страница:</translation>
-    </message>
-    <message>
-        <source>Downloads</source>
-        <translation>Загрузки</translation>
-    </message>
-    <message>
-        <source>The path to save files:</source>
-        <translation>Путь для сохранения файлов</translation>
-    </message>
-    <message>
-        <source>Change</source>
-        <translation>Изменить</translation>
-    </message>
-    <message>
-        <source>Tabs</source>
-        <translation>Вкладки</translation>
-    </message>
-    <message>
-        <source>Switch to the tab that opens</source>
-        <translation>Переключаться на открываемую вкладку</translation>
-    </message>
-    <message>
-        <source>Browser</source>
-        <translation>Браузер</translation>
-    </message>
-    <message>
-        <source>Load images automatically</source>
-        <translation>Автоматически загружать изображения</translation>
-    </message>
-    <message>
-        <source>Enable Javascript</source>
-        <translation>Включить Javascript</translation>
-    </message>
-    <message>
-        <source>Support for the Java applet tag</source>
-        <translation>Поддержка Java аплетов</translation>
-    </message>
-    <message>
-        <source>Local Storage Support</source>
-        <translation>Поддержка локального хранилища</translation>
-    </message>
-    <message>
-        <source>Saving history</source>
-        <translation>Сохранение истории</translation>
-    </message>
-    <message>
-        <source>Remove</source>
-        <translation>Удалить</translation>
-    </message>
-    <message>
-        <source>Move to VIP</source>
-        <translation>Переместить в VIP</translation>
-    </message>
-</context>
-<context>
-    <name>TabWidget</name>
-    <message>
-        <source>url page</source>
+        <location filename="../mainwindow.ui" line="14"/>
+        <source>MainWindow</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Search by page</source>
-        <translation>Поиск по странице</translation>
-    </message>
-    <message>
-        <source>Select all found items</source>
-        <translation>Выбрать все найденые элементы</translation>
-    </message>
-    <message>
-        <source>BLANK</source>
+        <location filename="../mainwindow.ui" line="25"/>
+        <source>2400</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>SETTINGS</source>
-        <translation>Настройки</translation>
+        <location filename="../mainwindow.ui" line="30"/>
+        <source>9600</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>BOOKMARKS</source>
-        <translation>Закладки</translation>
+        <location filename="../mainwindow.ui" line="35"/>
+        <source>19200</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>ABOUT</source>
-        <translation>Обо мне</translation>
-    </message>
-</context>
-<context>
-    <name>WebView</name>
-    <message>
-        <source>Hide inspector</source>
-        <translation>Скрыть инспектора</translation>
+        <location filename="../mainwindow.ui" line="40"/>
+        <source>115200</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>About</source>
-        <translation>Обо мне</translation>
+        <location filename="../mainwindow.ui" line="48"/>
+        <source>CLEAR</source>
+        <translation>Очистить</translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.ui" line="55"/>
+        <source>&lt;b&gt;Speed:&lt;/b&gt;</source>
+        <translation>&lt;b&gt;Скорость:&lt;/b&gt;</translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.ui" line="65"/>
+        <source>MODE</source>
+        <translation>РЕЖИМ</translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.ui" line="78"/>
+        <source>&lt;b&gt;Port:&lt;/b&gt;</source>
+        <translation>&lt;b&gt;Порт:&lt;/b&gt;</translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.ui" line="85"/>
+        <location filename="../mainwindow.cpp" line="33"/>
+        <location filename="../mainwindow.cpp" line="55"/>
+        <source>OPEN</source>
+        <translation>ОТКРЫТЬ</translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.ui" line="105"/>
+        <source>HEX</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.cpp" line="44"/>
+        <source>CLOSE</source>
+        <translation>ЗАКРЫТЬ</translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.cpp" line="100"/>
+        <source>Mode: %1</source>
+        <translation>Режим: %1</translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.cpp" line="189"/>
+        <source>Console</source>
+        <translation>Консоль</translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.cpp" line="191"/>
+        <source>Terminal</source>
+        <translation>Терминал</translation>
     </message>
 </context>
 </TS>
