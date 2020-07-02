@@ -113,7 +113,7 @@ void ConsoleWidget::onEnter()
 
 		for( uint16_t i = 0; i < cmd.length(); i += 2 ){
 			bool res = false;
-			auto byte = cmd.left( 2 ).toUShort( &res, 16 );
+			auto byte = cmd.mid( i, 2 ).toUShort( &res, 16 );
 			if( !res ){
 				continue;
 			}

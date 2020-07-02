@@ -62,13 +62,13 @@ MainWindow::MainWindow(QWidget *parent)
 	} );
 	connect( ui->clearB, &QPushButton::clicked, this, [this](){
 		m_pConsole->clear();
+		m_pHexConsole->clear();
 		m_pConsole->insertPrompt( false );
 		m_pConsole->setFocus();
 	} );
 	connect( ui->hexB, &QPushButton::toggled, this, [this](bool checked){
 		m_pConsole->setFocus();
 		if( checked ){
-			m_pHexConsole->clear();
 			m_pHexConsole->show();
 		}else{
 			m_pHexConsole->hide();
