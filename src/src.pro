@@ -8,6 +8,14 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = serialterminal
 CONFIG += c++11
 
+CONFIG(debug, debug|release):CONFIGURATION=debug
+CONFIG(release, debug|release):CONFIGURATION=release
+
+build_pass:CONFIG(debug, debug|release) {
+    unix: TARGET = $$join(TARGET,,,_debug)
+    else: TARGET = $$join(TARGET,,,d)
+}
+
 DEFINES += QT_DEPRECATED_WARNINGS
 
 OBJECTS_DIR         = ../build
