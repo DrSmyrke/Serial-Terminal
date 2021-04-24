@@ -1,7 +1,9 @@
 QT       += core gui serialport
 
+##################################################
 #uncomment from static build
 #QMAKE_LFLAGS_RELEASE += -static -static-libgcc
+##################################################
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 

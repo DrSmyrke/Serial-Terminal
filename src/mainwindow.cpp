@@ -89,6 +89,37 @@ MainWindow::MainWindow(QWidget *parent)
 		}
 	} );
 
+	connect( ui->ModbusRTUCRCB, &QPushButton::clicked, this, [this](){
+		QByteArray* data = m_pConsole->getHexData();
+
+		unsigned short crc, temp2, flag;
+		crc = 0xFFFF;
+		for( unsigned char i = 0; i < data->size(); i++){
+			crc = crc ^ data->at( i );
+			for( unsigned char j = 1; j <= 8; j++ ){
+				flag = crc & 0x0001;
+				crc >>=1;
+				if (flag) crc ^= 0xA001;
+			}
+		}
+		// Reverse byte order.
+		temp2 = crc >> 8;
+		crc = (crc << 8) | temp2;
+		crc &= 0xFFFF;
+
+		uint8_t crcHi, crcLo;
+		crcHi = crc >> 8;
+		crcLo = crc;
+
+		data->append( crcHi );
+		data->append( crcLo );
+
+		QString string = QString( data->right( 2 ).toHex() );
+		for( uint8_t i = 0; i < string.length(); i++ ){
+			m_pConsole->addCmdSym( string.at( i ) );
+		}
+	} );
+
 	connect( m_pConsole, &ConsoleWidget::signal_onCommand, this, [this](const QByteArray &cmd){
 		if( cmd == "help" ){
 			m_pConsole->output( "====== HELP MENU ========\nmode input hex\nmode input ascii" );
@@ -188,8 +219,10 @@ void MainWindow::updateModeB()
 {
 	if( m_pConsole->isConsole() ){
 		ui->modeB->setText( tr("Console") );
+		ui->ModbusRTUCRCB->setEnabled( false );
 	}else{
 		ui->modeB->setText( tr("Terminal") );
+		ui->ModbusRTUCRCB->setEnabled( true );
 	}
 }
 

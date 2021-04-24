@@ -91,6 +91,15 @@ void ConsoleWidget::insertPrompt(bool insertNewBlock)
 	scrollDown();
 }
 
+void ConsoleWidget::addCmdSym(const QString sym)
+{
+	if( m_hexInputMode ){
+		checkHexModeRazrjad();
+	}
+	this->textCursor().insertText( sym );
+	scrollDown();
+}
+
 void ConsoleWidget::onEnter()
 {
 	if( m_viewOnlyMode ){
@@ -105,29 +114,38 @@ void ConsoleWidget::onEnter()
 
 	historyAdd(cmd);
 
-	QByteArray cmdBuf;
+	//QByteArray cmdBuf;
 
-	if( cmd.left( 2 ) == "0x" ){
-		cmd.remove( 0, 2 );
-		cmd = cmd.replace(" ","");
-
-		for( uint16_t i = 0; i < cmd.length(); i += 2 ){
-			bool res = false;
-			auto byte = cmd.mid( i, 2 ).toUShort( &res, 16 );
-			if( !res ){
-				continue;
-			}
-			cmdBuf.append( byte );
+	if( m_hexInputMode ){
+		if( m_hexData.size() > 0 ){
+			emit signal_onCommand( m_hexData );
+		}
+	}else{
+		if( cmd.length() > 0 ){
+			emit signal_onCommand( cmd.toUtf8() );
 		}
 	}
+//	if( cmd.left( 2 ) == "0x" ){
+//		cmd.remove( 0, 2 );
+//		cmd = cmd.replace(" ","");
 
-	if( cmdBuf.size() == 0 ){
-		cmdBuf.append( cmd );
-	}
+//		for( uint16_t i = 0; i < cmd.length(); i += 2 ){
+//			bool res = false;
+//			auto byte = cmd.mid( i, 2 ).toUShort( &res, 16 );
+//			if( !res ){
+//				continue;
+//			}
+//			cmdBuf.append( byte );
+//		}
+//	}
 
-	if( cmdBuf.size() > 0 ){
-		emit signal_onCommand( cmdBuf );
-	}
+//	if( cmdBuf.size() == 0 ){
+//		cmdBuf.append( cmd );
+//	}
+
+//	if( cmdBuf.size() > 0 ){
+//		emit signal_onCommand( cmdBuf );
+//	}
 }
 
 void ConsoleWidget::historyAdd(const QString &cmd)
@@ -159,10 +177,11 @@ void ConsoleWidget::historyForward()
 	cursor.movePosition(QTextCursor::StartOfBlock);
 	cursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::KeepAnchor);
 	cursor.removeSelectedText();
-	if(m_historyPos == m_history.length() - 1)
+	if(m_historyPos == m_history.length() - 1){
 		cursor.insertText(m_prompt);
-	else
+	}else{
 		cursor.insertText(m_prompt + m_history.at(m_historyPos + 1));
+	}
 	setTextCursor(cursor);
 	m_historyPos++;
 }
@@ -175,6 +194,8 @@ void ConsoleWidget::scrollDown()
 
 void ConsoleWidget::checkHexModeRazrjad()
 {
+	m_hexData.clear();
+
 	if( !m_hexInputMode ) return;
 
 	QString cmd = this->textCursor().block().text().mid( m_prompt.length() );
@@ -187,8 +208,19 @@ void ConsoleWidget::checkHexModeRazrjad()
 		return;
 	}
 
-	if( cmd.replace(" ","").length() % 2 == 0 ){
+	cmd = cmd.replace(" ","");
+
+	if( cmd.length() % 2 == 0 ){
 		this->textCursor().insertText( " " );
+	}
+
+	for( uint16_t i = 0; i < cmd.length(); i += 2 ){
+		bool res = false;
+		auto byte = cmd.mid( i, 2 ).toUShort( &res, 16 );
+		if( !res ){
+			continue;
+		}
+		m_hexData.append( byte );
 	}
 }
 
@@ -240,25 +272,6 @@ void ConsoleWidget::keyPressEvent(QKeyEvent *event)
 		return;
 	}
 
-	if( m_hexInputMode ){
-		if(event->key() == Qt::Key_Space) return;
-		if(event->key() == Qt::Key_Left) return;
-		if(event->key() == Qt::Key_Right) return;
-	}
-
-	if(event->key() >= 0x20 && event->key() <= 0x7e
-			&& (event->modifiers() == Qt::NoModifier || event->modifiers() == Qt::ShiftModifier)){
-		QString cmd = this->textCursor().block().text().mid( m_prompt.length() );
-		if( cmd.left( 2 ) == "0x" ){
-			m_hexInputMode = true;
-		}else{
-			m_hexInputMode = false;
-		}
-		QPlainTextEdit::keyPressEvent(event);
-
-		checkHexModeRazrjad();
-	}
-
 	if(event->key() == Qt::Key_Backspace
 		   && event->modifiers() == Qt::NoModifier
 		   && textCursor().positionInBlock() > m_prompt.length()){
@@ -267,6 +280,28 @@ void ConsoleWidget::keyPressEvent(QKeyEvent *event)
 			QPlainTextEdit::keyPressEvent(event);
 		}
 		QPlainTextEdit::keyPressEvent(event);
+	}
+
+	QString cmd = this->textCursor().block().text().mid( m_prompt.length() );
+	if( cmd.left( 2 ) == "0x" ){
+		m_hexInputMode = true;
+	}else{
+		m_hexInputMode = false;
+	}
+
+	if( m_hexInputMode ){
+		if(event->key() == Qt::Key_Space) return;
+		if(event->key() == Qt::Key_Left) return;
+		if(event->key() == Qt::Key_Right) return;
+
+		if( ( event->key() >= Qt::Key_0 && event->key() <= Qt::Key_9 ) || ( event->key() >= Qt::Key_A && event->key() <= Qt::Key_F ) ){
+			QPlainTextEdit::keyPressEvent(event);
+			checkHexModeRazrjad();
+		}
+	}else{
+		if( event->key() >= Qt::Key_Space && event->key() <= Qt::Key_AsciiTilde ){
+			QPlainTextEdit::keyPressEvent(event);
+		}
 	}
 
 	if(event->key() == Qt::Key_Left

@@ -22,6 +22,8 @@ public:
 	void insertPrompt(bool insertNewBlock = true);
 	void setViewOnlyMode(bool viewOnly = true){ m_viewOnlyMode = viewOnly; }
 	void setViewHexOnly(bool viewHexOnly = true){ m_hexInputMode = viewHexOnly; }
+	QByteArray* getHexData(){ return &m_hexData; }
+	void addCmdSym(const QString sym);
 signals:
 	void signal_onCommand(const QByteArray &cmd);
 	void signal_modeChange(const QString &mode);
@@ -33,6 +35,7 @@ private:
 	bool m_consoleMode;
 	bool m_viewOnlyMode;
 	uint8_t m_hexSymCounter;
+	QByteArray m_hexData;
 
 	void onEnter();
 	void historyAdd(const QString &cmd);
