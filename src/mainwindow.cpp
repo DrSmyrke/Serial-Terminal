@@ -2,7 +2,6 @@
 #include "ui_mainwindow.h"
 #include <QSerialPortInfo>
 
-
 MainWindow::MainWindow(QWidget *parent)
 	: QMainWindow(parent)
 	, ui(new Ui::MainWindow)
@@ -26,6 +25,8 @@ MainWindow::MainWindow(QWidget *parent)
 	setWindowIcon( QIcon( "://index.ico" ) );
 	setMinimumSize( 640, 480 );
 
+	m_searchModbusF		= false;
+
 	rescanPorts();
 
 	m_pSPort->setPortName( ui->portBox->currentText() );
@@ -37,6 +38,8 @@ MainWindow::MainWindow(QWidget *parent)
 	ui->vBox->addWidget( m_pConsole );
 	ui->vBox->addWidget( m_pHexConsole );
 	ui->clearB->setIcon( this->style()->standardIcon(QStyle::SP_LineEditClearButton) );
+
+	connect( ui->actionSearch_for_packages, &QAction::triggered, this, [this](bool state){ m_searchModbusF = state; } );
 
 	connect( ui->connectB, &QPushButton::clicked, this, [this](){
 		if( !m_pSPort->isOpen() ){
@@ -64,6 +67,7 @@ MainWindow::MainWindow(QWidget *parent)
 		m_pConsole->clear();
 		m_pHexConsole->clear();
 		m_pConsole->insertPrompt( false );
+		m_pHexConsole->insertPrompt( false );
 		m_pConsole->setFocus();
 	} );
 	connect( ui->hexB, &QPushButton::toggled, this, [this](bool checked){
@@ -89,25 +93,12 @@ MainWindow::MainWindow(QWidget *parent)
 		}
 	} );
 
-	connect( ui->ModbusRTUCRCB, &QPushButton::clicked, this, [this](){
+	connect( ui->actionPaste_Modbus_RTU_CRC, &QAction::triggered, this, [this](){
 		QByteArray* data = m_pConsole->getHexData();
 
-		unsigned short crc, temp2, flag;
-		crc = 0xFFFF;
-		for( unsigned char i = 0; i < data->size(); i++){
-			crc = crc ^ data->at( i );
-			for( unsigned char j = 1; j <= 8; j++ ){
-				flag = crc & 0x0001;
-				crc >>=1;
-				if (flag) crc ^= 0xA001;
-			}
-		}
-		// Reverse byte order.
-		temp2 = crc >> 8;
-		crc = (crc << 8) | temp2;
-		crc &= 0xFFFF;
+		auto crc = calculateCRC( data->data(), data->size() );
 
-		uint8_t crcHi, crcLo;
+		char crcHi, crcLo;
 		crcHi = crc >> 8;
 		crcLo = crc;
 
@@ -115,9 +106,12 @@ MainWindow::MainWindow(QWidget *parent)
 		data->append( crcLo );
 
 		QString string = QString( data->right( 2 ).toHex() );
+		qDebug()<<">:"<<data->toHex()<<string;
+
 		for( uint8_t i = 0; i < string.length(); i++ ){
 			m_pConsole->addCmdSym( string.at( i ) );
 		}
+		m_pConsole->setFocus();
 	} );
 
 	connect( m_pConsole, &ConsoleWidget::signal_onCommand, this, [this](const QByteArray &cmd){
@@ -164,10 +158,69 @@ void MainWindow::slot_readyRead()
 	QByteArray buff;
 	while( m_pSPort->bytesAvailable() ) buff.append( m_pSPort->readAll() );
 
-	m_pConsole->output( buff );
 	if( !m_pHexConsole->isHidden() ){
 		m_pHexConsole->output( buff.toHex() );
 	}
+
+	if( m_searchModbusF && buff.size() >= 8 ){
+		QByteArray tmp			= buff.right( 2 );
+		uint8_t incrcHi			= tmp[0];
+		uint8_t incrcLo			= tmp[1];
+		uint16_t incrc			= incrcHi << 8;
+		incrc					+= incrcLo;
+		buff.remove( buff.size() - 2, 2 );
+		auto crc = calculateCRC( buff.data(), buff.size() );
+
+		ModbusRTUpkt* pkt		= ( ModbusRTUpkt* ) buff.data();
+
+		uint16_t startAddr		= pkt->addr[0] << 8;
+		startAddr				+= pkt->addr[1];
+		uint16_t count			= pkt->count[0] << 8;
+		count					+= pkt->count[1];
+
+		QString startstr = QString( "id: %1 cmd: %2 addr: %3 count: %4" )
+				.arg( QString::number( pkt->id ) )
+				.arg( QString::number( pkt->cmd ) )
+				.arg( QString::number( startAddr ) )
+				.arg( QString::number( count ) )
+				;
+
+		if( crc == incrc ){
+			if( ( pkt->cmd >= 1 && pkt->cmd <= 6 ) || pkt->cmd == 15 || pkt->cmd == 16 ){
+				if( pkt->cmd == 5 || pkt->cmd == 6 || pkt->cmd == 15 || pkt->cmd == 16 ){
+					startstr += " [";
+					if( pkt->cmd == 5 || pkt->cmd == 15 ){
+						for( uint8_t i = 0; i < count * 2; i+=2 ){
+							QString val = QString::number( pkt->data[ i ], 16 );
+							QString val2 = QString::number( pkt->data[ i + 1 ], 16 );
+							if( val.length() == 1 ) val = "0" + val;
+							if( val2.length() == 1 ) val2 = "0" + val;
+							startstr += QString( " %1%2" ).arg( val ).arg( val2 );
+						}
+					}else{
+						for( uint8_t i = 0; i < count; i++ ){
+							QString val = QString::number( pkt->data[ i ], 16 );
+							if( val.length() == 1 ) val = "0" + val;
+							startstr += QString( " %1" ).arg( val );
+						}
+					}
+					startstr += " ]";
+				}
+				m_pConsole->output( "MODBUS RTU: " + startstr );
+				return;
+			}else{
+				m_pConsole->output( "MODBUS RTU: " + startstr + " [wrong cmd]" );
+			}
+		}else{
+			if( ( pkt->cmd >= 1 && pkt->cmd <= 6 ) || pkt->cmd == 15 || pkt->cmd == 16 ){
+				m_pConsole->output( "Maybe MODBUS RTU: " + startstr + " [wrong crc]" );
+			}else{
+				m_pConsole->output( "Maybe MODBUS RTU: " + startstr + " [wrong cmd]" );
+			}
+		}
+	}
+
+	m_pConsole->output( buff );
 }
 
 void MainWindow::rescanPorts()
@@ -211,6 +264,7 @@ void MainWindow::sendData(const QByteArray &data)
 		m_pConsole->output( "Port is NOT open" );
 		return;
 	}
+
 	if( data.size() == 0 ) return;
 	m_pSPort->write( data );
 }
@@ -219,10 +273,10 @@ void MainWindow::updateModeB()
 {
 	if( m_pConsole->isConsole() ){
 		ui->modeB->setText( tr("Console") );
-		ui->ModbusRTUCRCB->setEnabled( false );
+		ui->actionPaste_Modbus_RTU_CRC->setEnabled( false );
 	}else{
 		ui->modeB->setText( tr("Terminal") );
-		ui->ModbusRTUCRCB->setEnabled( true );
+		ui->actionPaste_Modbus_RTU_CRC->setEnabled( true );
 	}
 }
 
@@ -243,4 +297,26 @@ void MainWindow::setConfigString()
 	str += QString::number( m_pSPort->stopBits() );
 
 	m_pPortError->setText( str );
+}
+
+unsigned short MainWindow::calculateCRC(const char *data, const unsigned char length)
+{
+	unsigned short crc, temp2, flag;
+	crc = 0xFFFF;
+
+	for( unsigned char i = 0; i < length; i++){
+		crc = crc ^ data[ i ];
+		for( unsigned char j = 1; j <= 8; j++ ){
+			flag = crc & 0x0001;
+			crc >>= 1;
+			if (flag) crc ^= 0xA001;
+		}
+	}
+
+	// Reverse byte order.
+	temp2 = crc >> 8;
+	crc = (crc << 8) | temp2;
+	crc &= 0xFFFF;
+
+	return crc;
 }

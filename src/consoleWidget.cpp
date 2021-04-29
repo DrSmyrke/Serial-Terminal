@@ -93,10 +93,10 @@ void ConsoleWidget::insertPrompt(bool insertNewBlock)
 
 void ConsoleWidget::addCmdSym(const QString sym)
 {
+	this->textCursor().insertText( sym );
 	if( m_hexInputMode ){
 		checkHexModeRazrjad();
 	}
-	this->textCursor().insertText( sym );
 	scrollDown();
 }
 
