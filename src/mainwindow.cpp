@@ -13,6 +13,7 @@ MainWindow::MainWindow(QWidget *parent)
 	m_pMode = new QLabel(this);
 	m_pConsole = new ConsoleWidget( this );
 	m_pHexConsole = new ConsoleWidget( this );
+	m_pTimer = new QTimer( this );
 
 	m_pSPort = new QSerialPort(this);
 		m_pSPort->setBaudRate( 115200 );
@@ -25,9 +26,13 @@ MainWindow::MainWindow(QWidget *parent)
 	setWindowIcon( QIcon( "://index.ico" ) );
 	setMinimumSize( 640, 480 );
 
-	m_searchModbusF		= false;
+	m_timeout				= ui->timeoutBox->value();
+	m_searchModbusF			= false;
+	m_hexDataAtNewLineF		= false;
 
 	rescanPorts();
+
+	m_pTimer->setInterval( m_timeout );
 
 	m_pSPort->setPortName( ui->portBox->currentText() );
 	m_pPortLabel->setText( ui->portBox->currentText() );
@@ -40,6 +45,7 @@ MainWindow::MainWindow(QWidget *parent)
 	ui->clearB->setIcon( this->style()->standardIcon(QStyle::SP_LineEditClearButton) );
 
 	connect( ui->actionSearch_for_packages, &QAction::triggered, this, [this](bool state){ m_searchModbusF = state; } );
+	connect( ui->actionHEX_Data_at_new_line, &QAction::triggered, this, [this](bool state){ m_hexDataAtNewLineF = state; } );
 
 	connect( ui->connectB, &QPushButton::clicked, this, [this](){
 		if( !m_pSPort->isOpen() ){
@@ -63,6 +69,19 @@ MainWindow::MainWindow(QWidget *parent)
 			rescanPorts();
 		}
 	} );
+
+	connect( ui->timeoutBox, QOverload<int>::of(&QSpinBox::valueChanged), [=](int i){
+		if( i < ui->timeoutBox->minimum() ) i =  ui->timeoutBox->minimum();
+		if( i > ui->timeoutBox->maximum() ) i =  ui->timeoutBox->maximum();
+		m_pTimer->setInterval( i );
+	} );
+
+	connect( m_pTimer, &QTimer::timeout, this, [this](){
+		m_pTimer->stop();
+		if( m_pSPort->bytesAvailable() )
+			slot_readyRead();
+	} );
+
 	connect( ui->clearB, &QPushButton::clicked, this, [this](){
 		m_pConsole->clear();
 		m_pHexConsole->clear();
@@ -106,7 +125,6 @@ MainWindow::MainWindow(QWidget *parent)
 		data->append( crcLo );
 
 		QString string = QString( data->right( 2 ).toHex() );
-		qDebug()<<">:"<<data->toHex()<<string;
 
 		for( uint8_t i = 0; i < string.length(); i++ ){
 			m_pConsole->addCmdSym( string.at( i ) );
@@ -155,11 +173,17 @@ MainWindow::~MainWindow()
 
 void MainWindow::slot_readyRead()
 {
+	if( m_pTimer->isActive() ) return;
+
 	QByteArray buff;
 	while( m_pSPort->bytesAvailable() ) buff.append( m_pSPort->readAll() );
 
 	if( !m_pHexConsole->isHidden() ){
-		m_pHexConsole->output( buff.toHex() );
+		if( !m_pConsole->isConsole() ){
+			m_pHexConsole->output( buff.toHex(), m_hexDataAtNewLineF );
+		}else{
+			m_pHexConsole->output( buff.toHex() );
+		}
 	}
 
 	if( m_searchModbusF && buff.size() >= 8 ){
@@ -221,6 +245,8 @@ void MainWindow::slot_readyRead()
 	}
 
 	m_pConsole->output( buff );
+
+	m_pTimer->start();
 }
 
 void MainWindow::rescanPorts()
@@ -274,9 +300,11 @@ void MainWindow::updateModeB()
 	if( m_pConsole->isConsole() ){
 		ui->modeB->setText( tr("Console") );
 		ui->actionPaste_Modbus_RTU_CRC->setEnabled( false );
+		ui->actionHEX_Data_at_new_line->setEnabled( false );
 	}else{
 		ui->modeB->setText( tr("Terminal") );
 		ui->actionPaste_Modbus_RTU_CRC->setEnabled( true );
+		ui->actionHEX_Data_at_new_line->setEnabled( true );
 	}
 }
 

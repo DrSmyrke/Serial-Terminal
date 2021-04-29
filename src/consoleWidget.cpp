@@ -38,7 +38,7 @@ ConsoleWidget::ConsoleWidget(QWidget *parent) : QPlainTextEdit(parent)
 	insertPrompt( false );
 }
 
-void ConsoleWidget::output(const QString &text)
+void ConsoleWidget::output(const QString &text, bool newLine)
 {
 	QTextCharFormat format;
 	format.setForeground(Qt::gray);
@@ -64,6 +64,7 @@ void ConsoleWidget::output(const QString &text)
 				this->textCursor().insertText( " " );
 			}
 		}
+		if( newLine ) this->textCursor().insertBlock();
 	}
 
 

@@ -16,7 +16,7 @@ public:
 		};
 	};
 	explicit ConsoleWidget(QWidget *parent = nullptr);
-	void output(const QString &text);
+	void output(const QString &text, bool newLine = false);
 	void setMode(const uint8_t mode);
 	bool isConsole(){ return m_consoleMode; }
 	void insertPrompt(bool insertNewBlock = true);

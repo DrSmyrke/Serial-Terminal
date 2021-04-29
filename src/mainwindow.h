@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QSerialPort>
 #include <QLabel>
+#include <QTimer>
 #include "global.h"
 #include "consoleWidget.h"
 
@@ -36,7 +37,10 @@ private:
 	QLabel* m_pMode;
 	ConsoleWidget* m_pConsole;
 	ConsoleWidget* m_pHexConsole;
+	QTimer* m_pTimer;
 	bool m_searchModbusF;
+	bool m_hexDataAtNewLineF;
+	uint32_t m_timeout;
 
 	void rescanPorts();
 	bool checkPort(const QString &port);
