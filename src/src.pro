@@ -20,10 +20,10 @@ build_pass:CONFIG(debug, debug|release) {
 
 DEFINES += QT_DEPRECATED_WARNINGS
 
-OBJECTS_DIR         = ../build
-MOC_DIR             = ../build
-RCC_DIR             = ../build
-UI_DIR              = ../build
+OBJECTS_DIR         = ../build/$$CONFIGURATION
+MOC_DIR             = ../build/$$CONFIGURATION
+RCC_DIR             = ../build/$$CONFIGURATION
+UI_DIR              = ../build/$$CONFIGURATION
 DESTDIR             = ../bin
 
 win32|win64{
