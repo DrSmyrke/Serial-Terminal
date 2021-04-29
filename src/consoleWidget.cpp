@@ -92,6 +92,12 @@ void ConsoleWidget::insertPrompt(bool insertNewBlock)
 	scrollDown();
 }
 
+void ConsoleWidget::setViewHexOnly(bool viewHexOnly)
+{
+	m_hexInputMode = viewHexOnly;
+	this->setReadOnly( m_hexInputMode );
+}
+
 void ConsoleWidget::addCmdSym(const QString sym)
 {
 	this->textCursor().insertText( sym );
@@ -246,11 +252,11 @@ void ConsoleWidget::setMode(const uint8_t mode)
 
 void ConsoleWidget::mousePressEvent(QMouseEvent *event)
 {
-	Q_UNUSED(event)
-	if( m_viewOnlyMode ){
+	if( m_viewOnlyMode && !m_hexInputMode ){
 		return;
 	}
-	this->setFocus();
+
+	QPlainTextEdit::mousePressEvent(event);
 }
 
 void ConsoleWidget::mouseDoubleClickEvent(QMouseEvent *event)
@@ -263,9 +269,14 @@ void ConsoleWidget::mouseDoubleClickEvent(QMouseEvent *event)
 
 void ConsoleWidget::keyPressEvent(QKeyEvent *event)
 {
+	if( m_hexInputMode && event->key() == Qt::Key_C	&& event->modifiers() == Qt::ControlModifier ){
+		QPlainTextEdit::keyPressEvent(event);
+		return;
+	}
 	if( m_viewOnlyMode ){
 		return;
 	}
+
 	if( m_consoleMode ){
 		QByteArray data;
 		data.append( event->text().toUtf8() );

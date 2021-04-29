@@ -21,7 +21,7 @@ public:
 	bool isConsole(){ return m_consoleMode; }
 	void insertPrompt(bool insertNewBlock = true);
 	void setViewOnlyMode(bool viewOnly = true){ m_viewOnlyMode = viewOnly; }
-	void setViewHexOnly(bool viewHexOnly = true){ m_hexInputMode = viewHexOnly; }
+	void setViewHexOnly(bool viewHexOnly = true);
 	QByteArray* getHexData(){ return &m_hexData; }
 	void addCmdSym(const QString sym);
 signals:
