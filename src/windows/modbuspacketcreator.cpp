@@ -95,7 +95,7 @@ void ModbusPacketCreator::calculateCRC()
 		m_data.append( countL );
 
 		if( m_requestAddDataSize ){
-			if( code == 6 || code == 15 ) count *= 2;
+			if( code == 6 || code == 16 ) count *= 2;
 			m_data.append( count );
 		}
 
