@@ -14,6 +14,7 @@ MainWindow::MainWindow(QWidget *parent)
 	m_pConsole = new ConsoleWidget( this );
 	m_pHexConsole = new ConsoleWidget( this );
 	m_pTimer = new QTimer( this );
+	m_pModbuspacketCreator = new ModbusPacketCreator( this );
 
 	m_pSPort = new QSerialPort(this);
 		m_pSPort->setBaudRate( 115200 );
@@ -115,7 +116,7 @@ MainWindow::MainWindow(QWidget *parent)
 	connect( ui->actionPaste_Modbus_RTU_CRC, &QAction::triggered, this, [this](){
 		QByteArray* data = m_pConsole->getHexData();
 
-		auto crc = calculateCRC( data->data(), data->size() );
+		auto crc = app::calculateCRC( data->data(), data->size() );
 
 		char crcHi, crcLo;
 		crcHi = crc >> 8;
@@ -152,6 +153,18 @@ MainWindow::MainWindow(QWidget *parent)
 		}
 		m_pConsole->output( "\r\n====== MODE CHANGE ========\r\n" );
 		updateModeB();
+		m_pConsole->setFocus();
+	} );
+
+	connect( ui->actionPacket_Creator, &QAction::triggered, m_pModbuspacketCreator, &ModbusPacketCreator::exec );
+	connect( m_pModbuspacketCreator, &ModbusPacketCreator::accepted, this, [this](){
+		auto ba = m_pModbuspacketCreator->getData()->toHex();
+
+		m_pConsole->addCmdSym( "0x" );
+
+		for( uint8_t i = 0; i < ba.size(); i++ ){
+			m_pConsole->addCmdSym( QString( ba.at( i ) ) );
+		}
 		m_pConsole->setFocus();
 	} );
 
@@ -193,7 +206,7 @@ void MainWindow::slot_readyRead()
 		uint16_t incrc			= incrcHi << 8;
 		incrc					+= incrcLo;
 		buff.remove( buff.size() - 2, 2 );
-		auto crc = calculateCRC( buff.data(), buff.size() );
+		auto crc = app::calculateCRC( buff.data(), buff.size() );
 
 		ModbusRTUpkt* pkt		= ( ModbusRTUpkt* ) buff.data();
 
@@ -325,26 +338,4 @@ void MainWindow::setConfigString()
 	str += QString::number( m_pSPort->stopBits() );
 
 	m_pPortError->setText( str );
-}
-
-unsigned short MainWindow::calculateCRC(const char *data, const unsigned char length)
-{
-	unsigned short crc, temp2, flag;
-	crc = 0xFFFF;
-
-	for( unsigned char i = 0; i < length; i++){
-		crc = crc ^ data[ i ];
-		for( unsigned char j = 1; j <= 8; j++ ){
-			flag = crc & 0x0001;
-			crc >>= 1;
-			if (flag) crc ^= 0xA001;
-		}
-	}
-
-	// Reverse byte order.
-	temp2 = crc >> 8;
-	crc = (crc << 8) | temp2;
-	crc &= 0xFFFF;
-
-	return crc;
 }

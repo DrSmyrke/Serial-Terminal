@@ -20,7 +20,7 @@ namespace app {
 	extern Config conf;
 
 	bool parsArgs(int argc, char *argv[]);
-	void setLog(const uint8_t logLevel, const QString &mess);
+	unsigned short calculateCRC(const char *data, const unsigned char length);
 }
 
 #endif // GLOBAL_H

@@ -7,6 +7,7 @@
 #include <QTimer>
 #include "global.h"
 #include "consoleWidget.h"
+#include "windows/modbuspacketcreator.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -41,12 +42,12 @@ private:
 	bool m_searchModbusF;
 	bool m_hexDataAtNewLineF;
 	uint32_t m_timeout;
+	ModbusPacketCreator* m_pModbuspacketCreator;
 
 	void rescanPorts();
 	bool checkPort(const QString &port);
 	void sendData(const QByteArray &data);
 	void updateModeB();
 	void setConfigString();
-	unsigned short calculateCRC(const char *data, const unsigned char length);
 };
 #endif // MAINWINDOW_H

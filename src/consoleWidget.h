@@ -42,6 +42,7 @@ private:
 	void historyBack();
 	void historyForward();
 	void scrollDown();
+	void checkInputHexMode();
 	void checkHexModeRazrjad();
 	void backSpace();
 

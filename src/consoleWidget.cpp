@@ -100,10 +100,9 @@ void ConsoleWidget::setViewHexOnly(bool viewHexOnly)
 
 void ConsoleWidget::addCmdSym(const QString sym)
 {
+	checkInputHexMode();
 	this->textCursor().insertText( sym );
-	if( m_hexInputMode ){
-		checkHexModeRazrjad();
-	}
+	checkHexModeRazrjad();
 	scrollDown();
 }
 
@@ -197,6 +196,16 @@ void ConsoleWidget::scrollDown()
 {
 	QScrollBar *vbar = this->verticalScrollBar();
 	vbar->setValue( vbar->maximum() );
+}
+
+void ConsoleWidget::checkInputHexMode()
+{
+	QString cmd = this->textCursor().block().text().mid( m_prompt.length() );
+	if( cmd.left( 2 ) == "0x" ){
+		m_hexInputMode = true;
+	}else{
+		m_hexInputMode = false;
+	}
 }
 
 void ConsoleWidget::checkHexModeRazrjad()
@@ -294,12 +303,7 @@ void ConsoleWidget::keyPressEvent(QKeyEvent *event)
 		QPlainTextEdit::keyPressEvent(event);
 	}
 
-	QString cmd = this->textCursor().block().text().mid( m_prompt.length() );
-	if( cmd.left( 2 ) == "0x" ){
-		m_hexInputMode = true;
-	}else{
-		m_hexInputMode = false;
-	}
+	checkInputHexMode();
 
 	if( m_hexInputMode ){
 		if(event->key() == Qt::Key_Space) return;

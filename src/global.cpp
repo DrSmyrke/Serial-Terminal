@@ -24,25 +24,26 @@ namespace app {
 		return ret;
 	}
 
-	void setLog(const uint8_t logLevel, const QString &mess)
+	unsigned short calculateCRC(const char *data, const unsigned char length)
 	{
-		if(app::conf.logLevel < logLevel or app::conf.logLevel == 0) return;
+		unsigned short crc, temp2, flag;
+		crc = 0xFFFF;
 
-		QDateTime dt = QDateTime::currentDateTime();
-		QString str = dt.toString("yyyy.MM.dd [hh:mm:ss] ") + mess + "\n";
-
-		if( app::conf.verbose ){
-			printf( "%s", str.toUtf8().data() );
-			fflush( stdout );
+		for( unsigned char i = 0; i < length; i++){
+			crc = crc ^ data[ i ];
+			for( unsigned char j = 1; j <= 8; j++ ){
+				flag = crc & 0x0001;
+				crc >>= 1;
+				if (flag) crc ^= 0xA001;
+			}
 		}
 
-		if( app::conf.logFile.isEmpty() ) return;
-		QFile f;
-		f.setFileName( app::conf.logFile );
-		if( f.open( QIODevice::Append ) ){
-			f.write( str.toUtf8() );
-			f.close();
-		}
+		// Reverse byte order.
+		temp2 = crc >> 8;
+		crc = (crc << 8) | temp2;
+		crc &= 0xFFFF;
+
+		return crc;
 	}
 
 }

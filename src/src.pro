@@ -2,7 +2,7 @@ QT       += core gui serialport
 
 ##################################################
 #uncomment from static build
-#QMAKE_LFLAGS_RELEASE += -static -static-libgcc
+QMAKE_LFLAGS_RELEASE += -static -static-libgcc
 ##################################################
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
@@ -36,15 +36,18 @@ SOURCES += \
     global.cpp \
     main.cpp \
     mainwindow.cpp \
-    consoleWidget.cpp
+    consoleWidget.cpp \
+    windows/modbuspacketcreator.cpp
 
 HEADERS += \
     global.h \
     mainwindow.h \
-    consoleWidget.h
+    consoleWidget.h \
+    windows/modbuspacketcreator.h
 
 FORMS += \
-    mainwindow.ui
+    mainwindow.ui \
+    windows/modbuspacketcreator.ui
 
 RESOURCES += resources.qrc
 
