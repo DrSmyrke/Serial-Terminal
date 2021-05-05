@@ -55,6 +55,7 @@ ModbusPacketCreator::ModbusPacketCreator(QWidget *parent) :
 			uint16_t value = text.toUShort( nullptr, 16 );
 			ui->tableWidget->item( row, 0 )->setText( QString::number( value ) );
 		}
+		calculateCRC();
 	} );
 
 	connect( ui->requestAddDataSizeCB, &QCheckBox::clicked, this, [this](bool checked){
