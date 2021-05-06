@@ -39,12 +39,14 @@ ModbusPacketCreator::ModbusPacketCreator(QWidget *parent) :
 		}else{
 			ui->addrBox->setEnabled( false );
 		}
-		resetTableRows( value );
+		resetTableRows( ui->countBox->value() );
 		calculateCRC();
 	} );
 
 	connect( ui->tableWidget, &QTableWidget::cellChanged, this, [this](int row, int column){
 		auto text = ui->tableWidget->item( row, column )->text();
+		text.replace( " ", "" );
+
 		if( column == 0 && ui->tableWidget->item( row, 1 ) != nullptr ){
 			uint16_t value = text.toUShort();
 			auto hex = QString::number( value, 16 ).toUpper();
@@ -80,6 +82,8 @@ void ModbusPacketCreator::calculateCRC()
 	m_data.append( (uint8_t)ui->idBox->value() );
 	m_data.append( code );
 
+	auto rowCount		= ui->tableWidget->rowCount();
+
 	if( m_requestMode ){
 		uint16_t addr	= (uint16_t)ui->addrBox->value();
 		uint8_t addrH, addrL;
@@ -100,16 +104,18 @@ void ModbusPacketCreator::calculateCRC()
 			m_data.append( count );
 		}
 
-		for( uint16_t i = 0; i < ui->tableWidget->rowCount(); i++ ){
+		for( uint16_t i = 0; i < rowCount; i++ ){
+			if( ui->tableWidget->item( i, 0 ) == nullptr ) continue;
+			auto text = ui->tableWidget->item( i, 0 )->text();
 			if( code == 6 || code == 16){
-				uint16_t value	= (uint16_t)ui->tableWidget->item( i, 0 )->text().toShort();
+				uint16_t value	= (uint16_t)text.toUShort();
 				uint8_t valueH, valueL;
 				valueH			= value >> 8;
 				valueL			= value;
 				m_data.append( valueH );
 				m_data.append( valueL );
 			}else{
-				uint8_t value	= (uint8_t)ui->tableWidget->item( i, 0 )->text().toShort();
+				uint8_t value	= (uint8_t)text.toUShort();
 				m_data.append( value );
 			}
 		}
@@ -120,16 +126,16 @@ void ModbusPacketCreator::calculateCRC()
 
 		m_data.append( count );
 
-		for( uint16_t i = 0; i < ui->tableWidget->rowCount(); i++ ){
+		for( uint16_t i = 0; i < rowCount; i++ ){
 			if( code == 3 || code == 4 ){
-				uint16_t value	= (uint16_t)ui->tableWidget->item( i, 0 )->text().toShort();
+				uint16_t value	= (uint16_t)ui->tableWidget->item( i, 0 )->text().toUShort();
 				uint8_t valueH, valueL;
 				valueH			= value >> 8;
 				valueL			= value;
 				m_data.append( valueH );
 				m_data.append( valueL );
 			}else{
-				uint8_t value	= (uint8_t)ui->tableWidget->item( i, 0 )->text().toShort();
+				uint8_t value	= (uint8_t)ui->tableWidget->item( i, 0 )->text().toUShort();
 				m_data.append( value );
 			}
 		}
@@ -170,9 +176,11 @@ void ModbusPacketCreator::resetTableRows(const int rowCount)
 		valItem->setText( "0" );
 
 		QTableWidgetItem *hexItem = new QTableWidgetItem();
-		hexItem->setText( "0x00" );
+		hexItem->setText( "00" );
 
 		ui->tableWidget->setItem( i, 0, valItem );
 		ui->tableWidget->setItem( i, 1, hexItem );
 	}
+
+	ui->tableWidget->update();
 }
