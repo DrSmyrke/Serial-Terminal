@@ -1,21 +1,20 @@
 QT       += core gui serialport
 
-##################################################
-#uncomment from static build
-#QMAKE_LFLAGS_RELEASE += -static -static-libgcc
-##################################################
-
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = serialterminal
 CONFIG += c++11
 
 CONFIG(debug, debug|release):CONFIGURATION=debug
-CONFIG(release, debug|release):CONFIGURATION=release
+
+CONFIG(release, debug|release){
+    CONFIGURATION=release
+    #from static build
+    QMAKE_LFLAGS_RELEASE += -static -static-libgcc
+}
 
 build_pass:CONFIG(debug, debug|release) {
-    unix: TARGET = $$join(TARGET,,,_debug)
-    else: TARGET = $$join(TARGET,,,d)
+    TARGET = $$join(TARGET,,,_debug)
 }
 
 DEFINES += QT_DEPRECATED_WARNINGS

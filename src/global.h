@@ -20,7 +20,8 @@ namespace app {
 	extern Config conf;
 
 	bool parsArgs(int argc, char *argv[]);
-	unsigned short calculateCRC(const char *data, const unsigned char length);
+	unsigned short calculateCRC(char *data, unsigned char length);
+	unsigned short calculateCRC(unsigned char *data, unsigned char length);
 }
 
 #endif // GLOBAL_H
