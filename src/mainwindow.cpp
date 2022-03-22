@@ -31,7 +31,7 @@ MainWindow::MainWindow(QWidget *parent)
 	m_searchModbusF			= false;
 	m_hexDataAtNewLineF		= false;
 
-	rescanPorts();
+	slot_rescanPorts();
 
 	m_pTimer->setInterval( m_timeout );
 
@@ -44,6 +44,7 @@ MainWindow::MainWindow(QWidget *parent)
 	ui->vBox->addWidget( m_pConsole );
 	ui->vBox->addWidget( m_pHexConsole );
 	ui->clearB->setIcon( this->style()->standardIcon(QStyle::SP_LineEditClearButton) );
+	ui->refreshB->setIcon( this->style()->standardIcon(QStyle::SP_BrowserReload) );
 
 	connect( ui->actionSearch_for_packages, &QAction::triggered, this, [this](bool state){ m_searchModbusF = state; } );
 	connect( ui->actionHEX_Data_at_new_line, &QAction::triggered, this, [this](bool state){ m_hexDataAtNewLineF = state; } );
@@ -67,7 +68,7 @@ MainWindow::MainWindow(QWidget *parent)
 				ui->portBox->setEnabled( true );
 				m_pPortError->clear();
 			}
-			rescanPorts();
+			slot_rescanPorts();
 		}
 	} );
 
@@ -112,6 +113,8 @@ MainWindow::MainWindow(QWidget *parent)
 			m_pSPort->setBaudRate( value );
 		}
 	} );
+
+	connect( ui->refreshB, &QPushButton::clicked, this, &MainWindow::slot_rescanPorts );
 
 	connect( ui->actionPaste_Modbus_RTU_CRC, &QAction::triggered, this, [this](){
 		QByteArray* data = m_pConsole->getHexData();
@@ -262,7 +265,7 @@ void MainWindow::slot_readyRead()
 	m_pTimer->start();
 }
 
-void MainWindow::rescanPorts()
+void MainWindow::slot_rescanPorts()
 {
 	ui->portBox->clear();
 	for( auto portInfo:QSerialPortInfo::availablePorts() ){

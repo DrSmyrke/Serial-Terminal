@@ -30,6 +30,7 @@ public:
 	~MainWindow();
 private slots:
 	void slot_readyRead();
+	void slot_rescanPorts();
 private:
 	Ui::MainWindow *ui;
 	QSerialPort* m_pSPort;
@@ -44,7 +45,6 @@ private:
 	uint32_t m_timeout;
 	ModbusPacketCreator* m_pModbuspacketCreator;
 
-	void rescanPorts();
 	bool checkPort(const QString &port);
 	void sendData(const QByteArray &data);
 	void updateModeB();
