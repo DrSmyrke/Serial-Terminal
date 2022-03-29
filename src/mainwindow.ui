@@ -168,7 +168,7 @@
      <x>0</x>
      <y>0</y>
      <width>875</width>
-     <height>26</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -190,6 +190,8 @@
      <string>Settings</string>
     </property>
     <addaction name="actionHEX_Data_at_new_line"/>
+    <addaction name="actionInsert_n_after"/>
+    <addaction name="actionInsert_r_n_at_end_data"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuSettings"/>
@@ -225,6 +227,22 @@
   <action name="actionPacket_Creator">
    <property name="text">
     <string>Packet Creator</string>
+   </property>
+  </action>
+  <action name="actionInsert_n_after">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Insert \n at end data</string>
+   </property>
+  </action>
+  <action name="actionInsert_r_n_at_end_data">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Insert \r\n at end data</string>
    </property>
   </action>
  </widget>

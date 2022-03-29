@@ -142,6 +142,19 @@ MainWindow::MainWindow(QWidget *parent)
 			return;
 		}
 		sendData( cmd );
+
+		if( !m_pConsole->isConsole() ){
+			QByteArray ba;
+			if( ui->actionInsert_n_after->isChecked() ){
+				ba.append( '\n' );
+			}
+			if( ui->actionInsert_r_n_at_end_data->isChecked() ){
+				ba.append( '\r' );
+				ba.append( '\n' );
+			}
+
+			if( ba.size() > 0 ) sendData( ba );
+		}
 	} );
 
 	connect( m_pConsole, &ConsoleWidget::signal_modeChange, this, [this](const QString &text){
@@ -260,6 +273,9 @@ void MainWindow::slot_readyRead()
 		}
 	}
 
+	if( !m_pConsole->isConsole() ){
+		buff.replace( '\r', "" );
+	}
 	m_pConsole->output( buff );
 
 	m_pTimer->start();
